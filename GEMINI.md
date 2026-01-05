@@ -1,0 +1,1 @@
+Always localize app in English, Khmer and Chinese (for app elements)

@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { FavoritesProvider } from "../context/FavoritesContext";
 import { OrdersProvider } from "../context/OrdersContext";
 import { LanguageProvider } from "../context/LanguageContext";
+import { AuthProvider } from "../context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,16 +26,19 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   return (
-    <LanguageProvider>
-      <OrdersProvider>
-        <FavoritesProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="store/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="list" options={{ title: 'All Stores', headerShown: true, headerBackTitle: 'Back' }} />
-          </Stack>
-        </FavoritesProvider>
-      </OrdersProvider>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <OrdersProvider>
+          <FavoritesProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="store/[id]" options={{ headerShown: false }} />
+              <Stack.Screen name="list" options={{ title: 'All Stores', headerShown: true, headerBackTitle: 'Back' }} />
+            </Stack>
+          </FavoritesProvider>
+        </OrdersProvider>
+      </LanguageProvider>
+    </AuthProvider>
   );
 }

@@ -74,7 +74,7 @@ export default function OrderSuccessScreen() {
         </View>
 
         <View style={styles.card}>
-            <Text style={[styles.cardTitle, { fontFamily: fonts.body }]}>{t('collectionTime')}</Text>
+            <Text style={[styles.cardTitle, { fontFamily: fonts.body }]}>{t('collect')}</Text>
             <Text style={[styles.cardTime, { fontFamily: fonts.heading }]}>{store?.pickupTime || 'Check store details'}</Text>
             
             <View style={styles.divider} />

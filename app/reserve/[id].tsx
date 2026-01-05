@@ -14,7 +14,7 @@ export default function ReserveScreen() {
     const store = STORES.find(s => s.id === id);
     const [quantity, setQuantity] = useState(1);
 
-    if (!store) return <View style={styles.container}><Text>Store not found</Text></View>;
+    if (!store) return <View style={styles.container}><Text>{t('storeNotFound')}</Text></View>;
 
     const subtotal = store.price * quantity;
     const taxes = subtotal * 0.086; // Approx tax
@@ -22,6 +22,9 @@ export default function ReserveScreen() {
 
     const increase = () => setQuantity(q => q + 1);
     const decrease = () => setQuantity(q => Math.max(1, q - 1));
+
+    const localizedTime = store.pickupTime.replace('Today', t('today')).replace('Tomorrow', t('tomorrow'));
+    const localizedCategory = t(`cat${store.category.replace(/\s+/g, '')}` as any) || store.category;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -42,9 +45,9 @@ export default function ReserveScreen() {
                     
                     <View style={styles.pickupRow}>
                         <View style={styles.pickupBadge}>
-                             <Text style={[styles.pickupBadgeText, { fontFamily: fonts.body }]}>{t('collectionTime')}</Text>
+                             <Text style={[styles.pickupBadgeText, { fontFamily: fonts.body }]}>{t('collect')}</Text>
                         </View>
-                        <Text style={[styles.pickupTime, { fontFamily: fonts.body }]}>{store.pickupTime}</Text>
+                        <Text style={[styles.pickupTime, { fontFamily: fonts.body }]}>{localizedTime}</Text>
                     </View>
                 </View>
 
@@ -55,7 +58,7 @@ export default function ReserveScreen() {
                     <View style={styles.paymentOptionRow}>
                         <View style={styles.paymentLeft}>
                             <Ionicons name="cash-outline" size={24} color={Colors.black} />
-                            <Text style={[styles.paymentText, { fontFamily: fonts.body }]}>Cash</Text>
+                            <Text style={[styles.paymentText, { fontFamily: fonts.body }]}>{t('cash')}</Text>
                         </View>
                         <Ionicons name="checkmark-circle" size={24} color={Colors.deepGreen} />
                     </View>
@@ -63,21 +66,21 @@ export default function ReserveScreen() {
                 
                  <View style={styles.summaryContainer}>
                     <View style={styles.summaryRow}>
-                        <Text style={[styles.summaryLabel, { fontFamily: fonts.body }]}>Subtotal</Text>
+                        <Text style={[styles.summaryLabel, { fontFamily: fonts.body }]}>{t('subtotal')}</Text>
                         <Text style={[styles.summaryValue, { fontFamily: fonts.body }]}>${subtotal.toFixed(2)}</Text>
                     </View>
                     <View style={styles.summaryRow}>
-                        <Text style={[styles.summaryLabel, { fontFamily: fonts.body }]}>Sales taxes</Text>
+                        <Text style={[styles.summaryLabel, { fontFamily: fonts.body }]}>{t('salesTax')}</Text>
                         <Text style={[styles.summaryValue, { fontFamily: fonts.body }]}>${taxes.toFixed(2)}</Text>
                     </View>
                      <View style={[styles.summaryRow, { marginTop: 12 }]}>
-                        <Text style={[styles.totalLabel, { fontFamily: fonts.body }]}>Total</Text>
+                        <Text style={[styles.totalLabel, { fontFamily: fonts.body }]}>{t('total')}</Text>
                         <Text style={[styles.totalValue, { fontFamily: fonts.body }]}>${total.toFixed(2)}</Text>
                     </View>
                  </View>
 
                  <Text style={[styles.legalText, { fontFamily: fonts.body }]}>
-                    By reserving this meal you agree to Too Good To Go's <Text style={styles.link}>Terms and Conditions</Text>.
+                    {t('agreeTerms')} <Text style={styles.link}>{t('terms')}</Text>.
                  </Text>
              </ScrollView>
 

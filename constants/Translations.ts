@@ -7,7 +7,7 @@ export const translations = {
     tabMe: 'Me',
 
     // Home
-    howItWorks: 'How does LoopIt work?',
+    howItWorks: 'How LoopIt works',
     recommended: 'Recommended for you',
     pickupNow: 'Pick up now',
     breakfast: 'Pick up for breakfast',
@@ -26,6 +26,7 @@ export const translations = {
     surpriseBag: 'Surprise Bag',
     left: 'left',
     originalPrice: 'Value',
+    collect: 'Collect',
     
     // Store Details
     aboutBag: 'About this Surprise Bag',
@@ -52,6 +53,8 @@ export const translations = {
     orderHistory: 'Order History',
     seeAll: 'See all',
     noOrders: 'No orders yet.',
+    businessSignUp: 'Business Sign-up',
+    joinLoopIt: 'Join LoopIt to reduce food waste and attract new customers.',
     
     // Settings
     settings: 'Settings',
@@ -68,6 +71,7 @@ export const translations = {
     inviteFriends: 'Invite your friends',
     recommendStore: 'Recommend a store',
     helpOrder: 'Help with an order',
+    signUpFoodBusiness: 'Sign up your food business',
     careers: 'Careers',
     hiddenStores: 'Hidden stores',
     
@@ -78,6 +82,30 @@ export const translations = {
     close: 'Close',
     pickupCode: 'Pickup Code',
     payment: 'Payment Method',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    cash: 'Cash',
+    subtotal: 'Subtotal',
+    salesTax: 'Sales tax',
+    total: 'Total',
+    agreeTerms: 'By reserving this meal you agree to Too Good To Go\'s',
+    terms: 'Terms and Conditions',
+    storeNotFound: 'Store not found',
+
+    // Auth
+    slogan: 'Eat like King.\nPay like Student.',
+    selectLanguage: 'Select Language',
+    enterPhone: 'Enter Your Phone Number',
+    verifyCode: 'Enter Verification Code',
+    verifyDesc: 'We sent a 6-digit code to',
+    resendCode: 'Resend Code',
+    continue: 'Continue',
+    fullName: 'Full Name',
+    email: 'Email',
+    welcome: 'Welcome',
+    completeProfile: 'Complete Your Profile',
+    invalidPhone: 'Invalid phone number',
+    invalidCode: 'Invalid code',
   },
   km: {
     // Tabs
@@ -106,6 +134,7 @@ export const translations = {
     surpriseBag: 'កញ្ចប់ភ្ញាក់ផ្អើល',
     left: 'នៅសល់',
     originalPrice: 'តម្លៃដើម',
+    collect: 'មកយក',
 
     // Store Details
     aboutBag: 'អំពីកញ្ចប់ភ្ញាក់ផ្អើលនេះ',
@@ -132,6 +161,8 @@ export const translations = {
     orderHistory: 'ប្រវត្តិការកុម្ម៉ង់',
     seeAll: 'មើលទាំងអស់',
     noOrders: 'មិនទាន់មានការកុម្ម៉ង់ទេ។',
+    businessSignUp: 'ការចុះឈ្មោះអាជីវកម្ម',
+    joinLoopIt: 'ចូលរួមជាមួយ LoopIt ដើម្បីកាត់បន្ថយការខ្ជះខ្ជាយអាហារ និងទាក់ទាញអតិថិជនថ្មី។',
 
     // Settings
     settings: 'ការកំណត់',
@@ -148,6 +179,7 @@ export const translations = {
     inviteFriends: 'ណែនាំមិត្តភក្តិ',
     recommendStore: 'ណែនាំហាង',
     helpOrder: 'ជំនួយជាមួយការកុម្ម៉ង់',
+    signUpFoodBusiness: 'ចុះឈ្មោះអាជីវកម្មម្ហូបអាហាររបស់អ្នក',
     careers: 'ការងារ',
     hiddenStores: 'ហាងដែលបានលាក់',
 
@@ -158,6 +190,30 @@ export const translations = {
     close: 'បិទ',
     pickupCode: 'លេខកូដមកយក',
     payment: 'វិធីបង់ប្រាក់',
+    today: 'ថ្ងៃនេះ',
+    tomorrow: 'ថ្ងៃស្អែក',
+    cash: 'សាច់ប្រាក់',
+    subtotal: 'សរុបរង',
+    salesTax: 'ពន្ធលើការលក់',
+    total: 'សរុប',
+    agreeTerms: 'ដោយការកក់អាហារនេះ អ្នកយល់ព្រមតាម',
+    terms: 'លក្ខខណ្ឌ',
+    storeNotFound: 'រកមិនឃើញហាង',
+
+    // Auth
+    slogan: 'ញ៉ាំដូចស្តេច\nបង់ដូចនិស្សិត',
+    selectLanguage: 'ជ្រើសរើសភាសា',
+    enterPhone: 'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក',
+    verifyCode: 'បញ្ចូលលេខកូដផ្ទៀងផ្ទាត់',
+    verifyDesc: 'យើងបានផ្ញើលេខកូដ 6 ខ្ទង់ទៅ',
+    resendCode: 'ផ្ញើលេខកូដម្តងទៀត',
+    continue: 'បន្ត',
+    fullName: 'ឈ្មោះ​ពេញ',
+    email: 'អ៊ីមែល',
+    welcome: 'សូមស្វាគមន៍',
+    completeProfile: 'បំពេញប្រវត្តិរូបរបស់អ្នក',
+    invalidPhone: 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ',
+    invalidCode: 'លេខកូដមិនត្រឹមត្រូវ',
   },
   zh: {
     // Tabs
@@ -186,6 +242,7 @@ export const translations = {
     surpriseBag: '惊喜袋',
     left: '剩余',
     originalPrice: '价值',
+    collect: '领取',
 
     // Store Details
     aboutBag: '关于此惊喜袋',
@@ -212,6 +269,8 @@ export const translations = {
     orderHistory: '历史订单',
     seeAll: '查看全部',
     noOrders: '暂无订单。',
+    businessSignUp: '商家注册',
+    joinLoopIt: '加入 LoopIt 以减少食物浪费并吸引新客户。',
 
     // Settings
     settings: '设置',
@@ -228,6 +287,7 @@ export const translations = {
     inviteFriends: '邀请好友',
     recommendStore: '推荐商店',
     helpOrder: '订单帮助',
+    signUpFoodBusiness: '注册您的食品业务',
     careers: '职业生涯',
     hiddenStores: '隐藏的商店',
 
@@ -238,5 +298,29 @@ export const translations = {
     close: '关闭',
     pickupCode: '取货码',
     payment: '支付方式',
+    today: '今天',
+    tomorrow: '明天',
+    cash: '现金',
+    subtotal: '小计',
+    salesTax: '销售税',
+    total: '总计',
+    agreeTerms: '预订此餐点即表示您同意 Too Good To Go 的',
+    terms: '条款和条件',
+    storeNotFound: '未找到商店',
+
+    // Auth
+    slogan: '像国王一样吃\n像学生一样付',
+    selectLanguage: '选择语言',
+    enterPhone: '输入您的电话号码',
+    verifyCode: '输入验证码',
+    verifyDesc: '我们发送了6位验证码至',
+    resendCode: '重发验证码',
+    continue: '继续',
+    fullName: '全名',
+    email: '电子邮件',
+    welcome: '欢迎',
+    completeProfile: '完善您的资料',
+    invalidPhone: '无效的电话号码',
+    invalidCode: '无效的验证码',
   }
 };

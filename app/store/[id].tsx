@@ -45,13 +45,13 @@ export default function StoreDetails() {
                         <Ionicons name="star" size={16} color={Colors.deepGreen} />
                         <Text style={[styles.rating, { fontFamily: fonts.body }]}>{store.rating} (50+ ratings)</Text>
                         <Text style={styles.dot}>•</Text>
-                        <Text style={[styles.category, { fontFamily: fonts.body }]}>{store.category}</Text>
+                        <Text style={[styles.category, { fontFamily: fonts.body }]}>{t(`cat${store.category.replace(/\s+/g, '')}` as any) || store.category}</Text>
                         <Text style={styles.dot}>•</Text>
                         <Text style={[styles.distance, { fontFamily: fonts.body }]}>{store.distance}</Text>
                     </View>
                     <View style={styles.pickupRow}>
                          <Ionicons name="time-outline" size={16} color={Colors.black} />
-                         <Text style={[styles.pickupText, { fontFamily: fonts.body }]}>{t('collection')}: {store.pickupTime}</Text>
+                         <Text style={[styles.pickupText, { fontFamily: fonts.body }]}>{t('collect')} {store.pickupTime.replace('Today', t('today')).replace('Tomorrow', t('tomorrow'))}</Text>
                     </View>
                 </View>
 
@@ -247,15 +247,13 @@ const styles = StyleSheet.create({
   pickupRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.offWhite,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    marginTop: 4,
   },
   pickupText: {
     marginLeft: 8,
     color: Colors.black,
     fontWeight: '500',
+    fontSize: 14,
   },
   divider: {
     height: 1,

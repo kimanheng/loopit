@@ -1,6 +1,12 @@
-import { View, Text } from 'react-native';
 import { Redirect } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
 
 export default function Index() {
-  return <Redirect href="/(tabs)" />;
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)" />;
+  } else {
+    return <Redirect href="/auth/landing" />;
+  }
 }

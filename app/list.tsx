@@ -33,7 +33,38 @@ export default function ListScreen() {
        return time.includes('17:') || time.includes('18:') || time.includes('19:') || time.includes('20:') || time.includes('21:');
     });
   } else if (filterType === 'now') {
-      data = data.slice(0, 5); // Mock logic
+      data = data.filter(s => {
+        const now = new Date();
+        const parts = s.pickupTime.split(' ');
+        if (parts.length < 4) return false;
+
+        const dayStr = parts[0];
+        const startStr = parts[1];
+        const endStr = parts[3];
+
+        let targetDate = new Date();
+        
+        if (dayStr === 'Tomorrow') {
+            targetDate.setDate(targetDate.getDate() + 1);
+        } else if (dayStr !== 'Today') {
+            return false;
+        }
+
+        const [startH, startM] = startStr.split(':').map(Number);
+        const [endH, endM] = endStr.split(':').map(Number);
+
+        const startDate = new Date(targetDate);
+        startDate.setHours(startH, startM, 0, 0);
+
+        const endDate = new Date(targetDate);
+        endDate.setHours(endH, endM, 0, 0);
+
+        if (endDate < startDate) {
+            endDate.setDate(endDate.getDate() + 1);
+        }
+
+        return now >= startDate && now <= endDate;
+      });
   } 
   
   return (

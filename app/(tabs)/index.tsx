@@ -37,8 +37,41 @@ export default function HomeScreen() {
   const lunchStores = getStoresByTime(categoryFilteredStores, ['11:', '12:', '13:', '14:']);
   const dinnerStores = getStoresByTime(categoryFilteredStores, ['17:', '18:', '19:', '20:', '21:']);
   
-  // "Now" is just a slice or random selection for demo if we don't have real time
-  const nowStores = categoryFilteredStores.slice(0, 5); 
+  const isStorePickupNow = (pickupTime: string) => {
+    const now = new Date();
+    // Format: "Today HH:MM - HH:MM"
+    const parts = pickupTime.split(' ');
+    if (parts.length < 4) return false;
+
+    const dayStr = parts[0];
+    const startStr = parts[1];
+    const endStr = parts[3];
+
+    let targetDate = new Date();
+    
+    if (dayStr === 'Tomorrow') {
+      targetDate.setDate(targetDate.getDate() + 1);
+    } else if (dayStr !== 'Today') {
+      return false;
+    }
+
+    const [startH, startM] = startStr.split(':').map(Number);
+    const [endH, endM] = endStr.split(':').map(Number);
+
+    const startDate = new Date(targetDate);
+    startDate.setHours(startH, startM, 0, 0);
+
+    const endDate = new Date(targetDate);
+    endDate.setHours(endH, endM, 0, 0);
+
+    if (endDate < startDate) {
+      endDate.setDate(endDate.getDate() + 1);
+    }
+
+    return now >= startDate && now <= endDate;
+  };
+
+  const nowStores = categoryFilteredStores.filter(store => isStorePickupNow(store.pickupTime));
 
   const navigateToSection = (title: string, type: string) => {
     router.push({ 
@@ -92,9 +125,9 @@ export default function HomeScreen() {
             onPress={() => navigateToSection("Pick up now", "now")} 
         />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
-            {nowStores.map((store) => (
+            {nowStores.length > 0 ? nowStores.map((store) => (
             <StoreCard key={`now-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
-            ))}
+            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>No pickup options available right now.</Text>}
         </ScrollView>
 
         <SectionHeader 
@@ -143,7 +176,7 @@ export default function HomeScreen() {
                      <Ionicons name="bag-check" size={20} color={Colors.white} />
                  </View>
                  <View>
-                     <Text style={[styles.bannerTitle, { fontFamily: fonts.body }]}>{t('collection')} {activeOrders[0].pickupTime}</Text>
+                     <Text style={[styles.bannerTitle, { fontFamily: fonts.body }]}>{t('collect')} {activeOrders[0].pickupTime.replace('Today', t('today')).replace('Tomorrow', t('tomorrow'))}</Text>
                      <Text style={[styles.bannerSubtitle, { fontFamily: fonts.body }]}>{activeOrders[0].storeName}</Text>
                  </View>
              </View>

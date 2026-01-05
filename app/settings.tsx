@@ -4,11 +4,12 @@ import { Stack, useRouter } from 'expo-router';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
-  { code: 'km', label: 'Khmer' },
-  { code: 'zh', label: 'Chinese' },
+  { code: 'km', label: 'ខ្មែរ' },
+  { code: 'zh', label: '中文' },
 ];
 
 interface SettingsItem {
@@ -23,6 +24,7 @@ interface SettingsItem {
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t, fonts } = useLanguage();
+  const { signOut } = useAuth();
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
   const SECTIONS: { title: string; items: SettingsItem[] }[] = [
@@ -47,6 +49,7 @@ export default function SettingsScreen() {
       items: [
         { id: 'help', labelKey: 'helpOrder', icon: 'briefcase-outline' },
         { id: 'how', labelKey: 'howItWorks', icon: 'help-circle-outline' },
+        { id: 'business', labelKey: 'signUpFoodBusiness', icon: 'storefront-outline' },
         { id: 'careers', labelKey: 'careers', icon: 'business-outline' },
       ]
     },
@@ -58,6 +61,15 @@ export default function SettingsScreen() {
       ]
     }
   ];
+
+  const handlePress = (item: SettingsItem) => {
+    if (item.id === 'logout') {
+      signOut();
+      router.replace('/auth/landing');
+    } else if (item.isLanguage) {
+      setShowLanguageOptions(!showLanguageOptions);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -86,7 +98,7 @@ export default function SettingsScreen() {
               <View key={item.id}>
                 <TouchableOpacity 
                   style={styles.row}
-                  onPress={() => item.isLanguage ? setShowLanguageOptions(!showLanguageOptions) : null}
+                  onPress={() => handlePress(item)}
                 >
                   <View style={styles.rowLeft}>
                     <Ionicons name={item.icon as any} size={24} color={Colors.black} style={styles.icon} />

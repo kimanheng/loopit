@@ -88,6 +88,18 @@ export default function MeScreen() {
               />
           )}
       </View>
+
+      <View style={styles.bannerContainer}>
+        <View style={styles.bannerContent}>
+            <View style={{ flex: 1 }}>
+                <Text style={[styles.bannerTitle, { fontFamily: fonts.heading }]}>{t('businessSignUp')}</Text>
+                <Text style={[styles.bannerText, { fontFamily: fonts.body }]}>{t('joinLoopIt')}</Text>
+            </View>
+            <TouchableOpacity style={styles.bannerButton}>
+                 <Text style={[styles.bannerButtonText, { fontFamily: fonts.heading }]}>{t('signUpFoodBusiness')}</Text>
+            </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -97,6 +109,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
     paddingTop: 60,
+  },
+  bannerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 30,
+    marginTop: 10,
+  },
+  bannerContent: {
+      backgroundColor: Colors.lightGreen,
+      borderRadius: 12,
+      padding: 20,
+      flexDirection: 'column',
+  },
+  bannerTitle: {
+      fontSize: 18,
+      color: Colors.deepGreen,
+      marginBottom: 8,
+  },
+  bannerText: {
+      fontSize: 14,
+      color: Colors.deepGreen,
+      marginBottom: 16,
+      lineHeight: 20,
+  },
+  bannerButton: {
+      backgroundColor: Colors.deepGreen,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignSelf: 'flex-start',
+  },
+  bannerButtonText: {
+      color: Colors.white,
+      fontSize: 14,
   },
   header: {
       flexDirection: 'row',

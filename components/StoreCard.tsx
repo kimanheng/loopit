@@ -59,7 +59,7 @@ export default function StoreCard({ store, containerStyle }: StoreCardProps) {
             
             <View style={styles.infoRow}>
                 <Text style={[styles.surpriseBag, { fontFamily: fonts.body }]}>{t('surpriseBag')}</Text>
-                <Text style={[styles.pickupTime, { fontFamily: fonts.body }]}>{store.pickupTime}</Text>
+                <Text style={[styles.pickupTime, { fontFamily: fonts.body }]}>{store.pickupTime.replace('Today', t('today')).replace('Tomorrow', t('tomorrow'))}</Text>
             </View>
             
             <View style={styles.footerRow}>
