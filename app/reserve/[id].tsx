@@ -1,18 +1,39 @@
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
-import { STORES } from '../../data/mockData';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { useOrders } from '../../context/OrdersContext';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function ReserveScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const { t, fonts } = useLanguage();
-    const store = STORES.find(s => s.id === id);
+    const { addOrder } = useOrders();
+    const { user } = useAuth();
+    
+    const store = useQuery(api.stores.get, { id: id as any });
+
     const [quantity, setQuantity] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (user?.userType === 'business') {
+        router.back();
+        return null;
+    }
+
+    if (store === undefined) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color={Colors.deepGreen} />
+            </View>
+        );
+    }
 
     if (!store) return <View style={styles.container}><Text>{t('storeNotFound')}</Text></View>;
 
@@ -23,8 +44,35 @@ export default function ReserveScreen() {
     const increase = () => setQuantity(q => q + 1);
     const decrease = () => setQuantity(q => Math.max(1, q - 1));
 
+    const handleReserve = async () => {
+        setIsSubmitting(true);
+        const result = await addOrder({
+            storeId: store._id,
+            storeName: store.name,
+            storeImage: store.image || '',
+            pickupTime: store.pickupTime,
+            price: total,
+            originalPrice: store.originalPrice, // Should probably be total original price but keeping per unit for now or simple logic
+            items: quantity,
+        });
+        setIsSubmitting(false);
+
+        if (result) {
+            router.push({ 
+                pathname: "/order-success", 
+                params: { 
+                    storeId: store._id,
+                    orderId: result.orderId,
+                    code: result.code
+                } 
+            });
+        } else {
+            // Handle error (e.g. not logged in)
+            alert("Failed to create order. Please try again.");
+        }
+    };
+
     const localizedTime = store.pickupTime.replace('Today', t('today')).replace('Tomorrow', t('tomorrow'));
-    const localizedCategory = t(`cat${store.category.replace(/\s+/g, '')}` as any) || store.category;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -96,10 +144,15 @@ export default function ReserveScreen() {
                 </View>
 
                 <TouchableOpacity 
-                    style={styles.reserveButton}
-                    onPress={() => router.push({ pathname: "/order-success", params: { storeId: store.id } })}
+                    style={[styles.reserveButton, isSubmitting && { opacity: 0.7 }]}
+                    onPress={handleReserve}
+                    disabled={isSubmitting}
                 >
-                    <Text style={[styles.reserveButtonText, { fontFamily: fonts.body }]}>{t('reserve')}</Text>
+                    {isSubmitting ? (
+                        <ActivityIndicator color={Colors.white} />
+                    ) : (
+                        <Text style={[styles.reserveButtonText, { fontFamily: fonts.body }]}>{t('reserve')}</Text>
+                    )}
                 </TouchableOpacity>
              </View>
 

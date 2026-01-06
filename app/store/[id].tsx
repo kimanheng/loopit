@@ -1,19 +1,60 @@
+import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator, Linking, Platform, Alert } from 'react-native';
 import { Colors } from '../../constants/Colors';
-import { STORES } from '../../data/mockData';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { isTimeOver } from '../../utils/timeUtils';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { calculateDistance, DEFAULT_USER_LOCATION, getCurrentLocation } from '../../utils/locationUtils';
 
 export default function StoreDetails() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, fonts } = useLanguage();
-  const store = STORES.find(s => s.id === id);
+  const { user } = useAuth();
+  const [userLocation, setUserLocation] = useState(DEFAULT_USER_LOCATION);
+  
+  const store = useQuery(api.stores.get, { id: id as any });
 
-  if (!store) {
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+    };
+    fetchLocation();
+  }, []);
+
+  if (store === undefined) {
+      return (
+          <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+              <ActivityIndicator size="large" color={Colors.deepGreen} />
+          </View>
+      );
+  }
+
+  if (store === null) {
     return <View><Text>Store not found</Text></View>;
   }
+
+  const timeOver = isTimeOver(store.pickupTime);
+  const isSoldOut = store.itemsLeft === 0 || timeOver;
+  
+  const distance = calculateDistance(
+      userLocation.latitude,
+      userLocation.longitude,
+      store.latitude,
+      store.longitude
+  );
+
+  const openDirections = () => {
+    if (!store.latitude || !store.longitude) return;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${store.latitude},${store.longitude}`;
+    Linking.openURL(url);
+  };
 
   return (
     <>
@@ -21,12 +62,12 @@ export default function StoreDetails() {
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
             <View style={styles.imageHeader}>
-                <Image source={{ uri: store.image }} style={styles.image} />
+                <Image source={{ uri: store.image }} style={[styles.image, isSoldOut && styles.imageGrayscale]} />
                 <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color={Colors.white} />
                 </TouchableOpacity>
                  <View style={styles.logoContainer}>
-                    <Image source={{ uri: store.logo }} style={styles.logo} />
+                    <Image source={{ uri: store.logo }} style={[styles.logo, isSoldOut && styles.imageGrayscale]} />
                 </View>
             </View>
 
@@ -35,10 +76,16 @@ export default function StoreDetails() {
                     <Text style={[styles.title, { fontFamily: fonts.heading }]}>{store.name}</Text>
                     <View style={styles.subtitleRow}>
                         <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>{t('surpriseBag')}</Text>
-                        {store.itemsLeft <= 5 && (
-                            <View style={styles.itemsLeftBadgeInline}>
-                                <Text style={[styles.itemsLeftTextInline, { fontFamily: fonts.body }]}>{store.itemsLeft} {t('left')}</Text>
+                        {isSoldOut ? (
+                            <View style={[styles.itemsLeftBadgeInline, styles.badgeSoldOut]}>
+                                <Text style={[styles.itemsLeftTextInline, { fontFamily: fonts.body }]}>{t('soldOut')}</Text>
                             </View>
+                        ) : (
+                            store.itemsLeft <= 5 && (
+                                <View style={styles.itemsLeftBadgeInline}>
+                                    <Text style={[styles.itemsLeftTextInline, { fontFamily: fonts.body }]}>{store.itemsLeft} {t('left')}</Text>
+                                </View>
+                            )
                         )}
                     </View>
                     <View style={styles.ratingRow}>
@@ -47,7 +94,7 @@ export default function StoreDetails() {
                         <Text style={styles.dot}>•</Text>
                         <Text style={[styles.category, { fontFamily: fonts.body }]}>{t(`cat${store.category.replace(/\s+/g, '')}` as any) || store.category}</Text>
                         <Text style={styles.dot}>•</Text>
-                        <Text style={[styles.distance, { fontFamily: fonts.body }]}>{store.distance}</Text>
+                        <Text style={[styles.distance, { fontFamily: fonts.body }]}>{distance}</Text>
                     </View>
                     <View style={styles.pickupRow}>
                          <Ionicons name="time-outline" size={16} color={Colors.black} />
@@ -68,11 +115,42 @@ export default function StoreDetails() {
 
                  <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { fontFamily: fonts.heading }]}>{t('location')}</Text>
-                    <View style={styles.mapPlaceholder}>
-                        <Text style={[styles.mapText, { fontFamily: fonts.body }]}>Map Preview</Text>
+                    <View style={styles.mapContainer}>
+                        <MapView
+                            style={styles.map}
+                            initialRegion={{
+                                latitude: store.latitude || 51.5074,
+                                longitude: store.longitude || -0.1278,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005,
+                            }}
+                        >
+                            <Marker
+                                coordinate={{
+                                    latitude: store.latitude || 51.5074,
+                                    longitude: store.longitude || -0.1278,
+                                }}
+                            >
+                                <View style={styles.customMarker}>
+                                    <Image source={{ uri: store.logo }} style={styles.markerImage} />
+                                </View>
+                            </Marker>
+                        </MapView>
                     </View>
-                    <Text style={[styles.address, { fontFamily: fonts.body }]}>123 High Street, London, UK</Text>
-                    <TouchableOpacity style={styles.directionsBtn}>
+                    
+                    {store.locationDescription && (
+                        <View style={styles.locationDetailRow}>
+                            <Ionicons name="information-circle-outline" size={16} color={Colors.gray} style={{ marginTop: 2 }} />
+                            <Text style={[styles.locationDescription, { fontFamily: fonts.body }]}>{store.locationDescription}</Text>
+                        </View>
+                    )}
+                     {store.plusCode && (
+                        <View style={styles.locationDetailRow}>
+                            <Ionicons name="map-outline" size={16} color={Colors.gray} />
+                            <Text style={[styles.plusCode, { fontFamily: fonts.body }]}>Plus Code: {store.plusCode}</Text>
+                        </View>
+                    )}
+                    <TouchableOpacity style={styles.directionsBtn} onPress={openDirections}>
                         <Text style={[styles.directionsBtnText, { fontFamily: fonts.body }]}>{t('getDirections')}</Text>
                     </TouchableOpacity>
                  </View>
@@ -130,10 +208,24 @@ export default function StoreDetails() {
                 </View>
             </View>
             <TouchableOpacity 
-                style={styles.reserveButton}
-                onPress={() => router.push({ pathname: "/reserve/[id]", params: { id: store.id } })}
+                style={[
+                    styles.reserveButton, 
+                    (isSoldOut || user?.userType === 'business') && styles.reserveButtonDisabled
+                ]}
+                onPress={() => {
+                    if (user?.userType === 'business') {
+                        Alert.alert(t('businessAccount'), t('businessNoReserve'));
+                        return;
+                    }
+                    if (!isSoldOut) {
+                        router.push({ pathname: "/reserve/[id]", params: { id: store._id } });
+                    }
+                }}
+                disabled={isSoldOut}
             >
-                <Text style={[styles.reserveButtonText, { fontFamily: fonts.body }]}>{t('reserve')}</Text>
+                <Text style={[styles.reserveButtonText, { fontFamily: fonts.body }]}>
+                    {isSoldOut ? 'Sold Out' : t('reserve')}
+                </Text>
             </TouchableOpacity>
         </View>
       </View>
@@ -159,6 +251,10 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
+  imageGrayscale: {
+      opacity: 0.8,
+      backgroundColor: '#ccc',
+  },
   backButton: {
     position: 'absolute',
     top: 50,
@@ -177,10 +273,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: Colors.white,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: Colors.lightGray,
+    // backgroundColor: Colors.white, // Removed
+    // padding: 4, // Removed
+    // borderWidth: 1, // Removed
+    // borderColor: Colors.lightGray, // Removed
   },
   logo: {
     width: '100%',
@@ -216,6 +312,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
+  },
+  badgeSoldOut: {
+      backgroundColor: Colors.gray,
   },
   itemsLeftTextInline: {
     color: Colors.white,
@@ -274,20 +373,48 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     marginBottom: 16,
   },
-  mapPlaceholder: {
+  mapContainer: {
     height: 150,
-    backgroundColor: Colors.lightGray,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
     marginBottom: 12,
   },
-  mapText: {
-    color: Colors.gray,
+  map: {
+      width: '100%',
+      height: '100%',
   },
-  address: {
-    color: Colors.black,
-    marginBottom: 12,
+  customMarker: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: Colors.white,
+      padding: 2,
+      borderWidth: 2,
+      borderColor: Colors.deepGreen,
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  markerImage: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 18,
+      resizeMode: 'cover',
+  },
+  locationDetailRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: 8,
+  },
+  locationDescription: {
+      marginLeft: 8,
+      color: Colors.gray,
+      fontSize: 14,
+      flex: 1,
+  },
+  plusCode: {
+      marginLeft: 8,
+      color: Colors.gray,
+      fontSize: 14,
   },
   directionsBtn: {
       borderWidth: 1,
@@ -391,6 +518,9 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  reserveButtonDisabled: {
+      backgroundColor: Colors.gray,
   },
   reserveButtonText: {
     color: Colors.white,

@@ -1,23 +1,54 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { Colors } from '../../constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
-export default function PhoneScreen() {
+export default function PasswordScreen() {
   const router = useRouter();
+  const { phone } = useLocalSearchParams<{ phone: string }>();
   const { t, fonts } = useLanguage();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { signIn, signUp } = useAuth();
+  
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleContinue = () => {
-    if (phoneNumber.length < 8) {
-      setError(t('invalidPhone'));
+  // Check if user exists
+  const existingUser = useQuery(api.users.getUser, phone ? { phoneNumber: phone } : "skip");
+  const isNewUser = existingUser === null;
+
+  const handleContinue = async () => {
+    if (password.length < 6) {
+      setError(t('passwordTooShort'));
       return;
     }
-    router.push({ pathname: '/auth/password', params: { phone: phoneNumber } });
+
+    setLoading(true);
+    setError('');
+
+    try {
+      if (isNewUser) {
+        // For new users, we might still want to verify phone? 
+        // But the task is "phone + password". 
+        // We'll proceed to info screen after setting password.
+        await signUp(phone!, password, 'consumer');
+        router.push({ pathname: '/auth/info', params: { phone } });
+      } else {
+        await signIn(phone!, password);
+        router.replace('/');
+      }
+    } catch (e: any) {
+      setError(t('invalidCredentials'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,32 +65,38 @@ export default function PhoneScreen() {
             <View style={styles.content}>
                 <View style={styles.headerSection}>
                     <Text style={[styles.title, { fontFamily: fonts.heading }]}>
-                        {t('enterPhone')}
+                        {isNewUser ? t('createAccount') : t('login')}
                     </Text>
                     <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
-                        We&apos;ll send you a verification code to confirm your number.
+                        {isNewUser 
+                          ? 'Set a password for your new account.' 
+                          : t('enterPassword')}
                     </Text>
                 </View>
 
                 <View style={styles.form}>
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.label, { fontFamily: fonts.body }]}>{t('contactNumber')}</Text>
+                        <Text style={[styles.label, { fontFamily: fonts.body }]}>{t('password')}</Text>
                         <View style={styles.inputWrapper}>
-                            <View style={styles.prefixContainer}>
-                                <Text style={[styles.prefixText, { fontFamily: fonts.body }]}>+855</Text>
-                            </View>
                             <TextInput
                                 style={[styles.input, { fontFamily: fonts.body }]}
-                                placeholder="12 345 678"
-                                keyboardType="number-pad"
-                                value={phoneNumber}
+                                placeholder="******"
+                                secureTextEntry={!showPassword}
+                                value={password}
                                 onChangeText={(text) => {
-                                    setPhoneNumber(text);
+                                    setPassword(text);
                                     setError('');
                                 }}
                                 autoFocus
                                 placeholderTextColor={Colors.gray + '80'}
                             />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                <Ionicons 
+                                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                                    size={20} 
+                                    color={Colors.gray} 
+                                />
+                            </TouchableOpacity>
                         </View>
                         {error ? <Text style={[styles.errorText, { fontFamily: fonts.body }]}>{error}</Text> : null}
                     </View>
@@ -67,17 +104,20 @@ export default function PhoneScreen() {
 
                 <View style={styles.footer}>
                     <TouchableOpacity 
-                        style={[styles.button, { opacity: phoneNumber.length >= 8 ? 1 : 0.5 }]} 
+                        style={[styles.button, { opacity: password.length >= 6 ? 1 : 0.5 }]} 
                         onPress={handleContinue}
-                        disabled={phoneNumber.length < 8}
+                        disabled={password.length < 6 || loading || existingUser === undefined}
                     >
-                        <Text style={[styles.buttonText, { fontFamily: fonts.body }]}>{t('continue')}</Text>
-                        <Ionicons name="arrow-forward" size={20} color={Colors.white} style={{ marginLeft: 8 }} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.helpButton} onPress={() => router.push('/how-it-works')}>
-                        <Ionicons name="information-circle-outline" size={18} color={Colors.deepGreen} />
-                        <Text style={[styles.helpText, { fontFamily: fonts.body }]}>{t('howItWorks')}</Text>
+                        {loading ? (
+                          <ActivityIndicator color={Colors.white} />
+                        ) : (
+                          <>
+                            <Text style={[styles.buttonText, { fontFamily: fonts.body }]}>
+                                {isNewUser ? t('continue') : t('login')}
+                            </Text>
+                            <Ionicons name="arrow-forward" size={20} color={Colors.white} style={{ marginLeft: 8 }} />
+                          </>
+                        )}
                     </TouchableOpacity>
                 </View>
             </View>
@@ -144,17 +184,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#FAFAFA',
       height: 56,
   },
-  prefixContainer: {
-    paddingRight: 12,
-    marginRight: 12,
-    borderRightWidth: 1,
-    borderRightColor: Colors.lightGray,
-  },
-  prefixText: {
-    fontSize: 16,
-    color: Colors.black,
-    fontWeight: 'bold',
-  },
   input: {
     flex: 1,
     fontSize: 18,
@@ -187,17 +216,5 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  helpButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 10,
-  },
-  helpText: {
-      fontSize: 14,
-      color: Colors.deepGreen,
-      marginLeft: 6,
-      fontWeight: '600',
   },
 });

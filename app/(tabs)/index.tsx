@@ -3,75 +3,131 @@ import { View, Text, StyleSheet, ScrollView, useWindowDimensions, TouchableOpaci
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../constants/Colors';
-import { STORES } from '../../data/mockData';
 import StoreCard from '../../components/StoreCard';
 import SectionHeader from '../../components/SectionHeader';
 import CategoryFilter from '../../components/CategoryFilter';
 import { Ionicons } from '@expo/vector-icons';
 import { useOrders } from '../../context/OrdersContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { isTimeOver } from '../../utils/timeUtils';
+import { calculateDistance, DEFAULT_USER_LOCATION, getCurrentLocation, getAddressFromCoords } from '../../utils/locationUtils';
 
 export default function HomeScreen() {
   const { activeOrders } = useOrders();
   const { t, fonts } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState(DEFAULT_USER_LOCATION);
+  const [locationName, setLocationName] = useState('Phnom Penh');
   const router = useRouter();
   const { width } = useWindowDimensions();
-  // 85% the width in discover page
   const cardWidth = width * 0.85;
 
-  // Base list filtered by category if selected
-  const categoryFilteredStores = selectedCategory 
-    ? STORES.filter(s => s.category === selectedCategory) 
-    : STORES;
+  const rawStores = useQuery(api.stores.list);
 
-  // Helper to filter by time strings (Simple contains check for demo)
-  const getStoresByTime = (sourceStores: typeof STORES, timeKeywords: string[]) => {
-      return sourceStores.filter(s => {
-          const time = s.pickupTime.toLowerCase();
-          return timeKeywords.some(k => time.includes(k));
+  React.useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      
+      const name = await getAddressFromCoords(location.latitude, location.longitude);
+      setLocationName(name);
+    };
+    fetchLocation();
+  }, []);
+
+  const getDistance = (distanceStr: string) => {
+    return parseFloat(distanceStr.replace(/[^0-9.]/g, ''));
+  };
+
+  const isSoldOut = (store: any) => {
+      return store.itemsLeft === 0 || isTimeOver(store.pickupTime);
+  };
+
+  const sortStores = (storesToSort: any[]) => {
+      return [...storesToSort].sort((a, b) => {
+          const soldOutA = isSoldOut(a);
+          const soldOutB = isSoldOut(b);
+
+          if (soldOutA !== soldOutB) {
+              return soldOutA ? 1 : -1; // Available first
+          }
+
+          const distA = getDistance(a.distance);
+          const distB = getDistance(b.distance);
+          return distA - distB;
       });
   };
 
-  const breakfastStores = getStoresByTime(categoryFilteredStores, ['06:', '07:', '08:', '09:', '10:']);
-  const lunchStores = getStoresByTime(categoryFilteredStores, ['11:', '12:', '13:', '14:']);
-  const dinnerStores = getStoresByTime(categoryFilteredStores, ['17:', '18:', '19:', '20:', '21:']);
+  const stores = sortStores((rawStores || []).map(s => ({ 
+      ...s, 
+      id: s._id,
+      distance: calculateDistance(
+          userLocation.latitude, 
+          userLocation.longitude, 
+          s.latitude, 
+          s.longitude
+      )
+  })));
+
+  const categoryFilteredStores = selectedCategory 
+    ? stores.filter(s => s.category === selectedCategory) 
+    : stores;
   
-  const isStorePickupNow = (pickupTime: string) => {
-    const now = new Date();
-    // Format: "Today HH:MM - HH:MM"
-    const parts = pickupTime.split(' ');
-    if (parts.length < 4) return false;
+  const recommendedStores = categoryFilteredStores.filter(s => !isSoldOut(s));
 
-    const dayStr = parts[0];
-    const startStr = parts[1];
-    const endStr = parts[3];
+  const parseTimeRange = (pickupTime: string) => {
+      // Handles both "Today 10:00 AM - 11:00 AM" and "10:00 AM - 11:00 AM"
+      const timeMatch = pickupTime.match(/(\d{1,2}:\d{2})\s?([AP]M)?\s*-\s*(\d{1,2}:\d{2})\s?([AP]M)?/i);
+      if (!timeMatch) return null;
 
-    let targetDate = new Date();
-    
-    if (dayStr === 'Tomorrow') {
-      targetDate.setDate(targetDate.getDate() + 1);
-    } else if (dayStr !== 'Today') {
-      return false;
-    }
+      const to24h = (time: string, period: string) => {
+          let [h] = time.split(':').map(Number);
+          if (period) {
+              if (period.toUpperCase() === 'PM' && h !== 12) h += 12;
+              if (period.toUpperCase() === 'AM' && h === 12) h = 0;
+          }
+          return h;
+      };
 
-    const [startH, startM] = startStr.split(':').map(Number);
-    const [endH, endM] = endStr.split(':').map(Number);
-
-    const startDate = new Date(targetDate);
-    startDate.setHours(startH, startM, 0, 0);
-
-    const endDate = new Date(targetDate);
-    endDate.setHours(endH, endM, 0, 0);
-
-    if (endDate < startDate) {
-      endDate.setDate(endDate.getDate() + 1);
-    }
-
-    return now >= startDate && now <= endDate;
+      return {
+          start: to24h(timeMatch[1], timeMatch[2]),
+          end: to24h(timeMatch[3], timeMatch[4])
+      };
   };
 
+  const filterByTimeRange = (sourceStores: any[], startHour: number, endHour: number) => {
+      return sourceStores.filter(s => {
+          const range = parseTimeRange(s.pickupTime);
+          if (!range) return false;
+          // Check overlap: storeStart <= mealEnd && storeEnd >= mealStart
+          return range.start <= endHour && range.end >= startHour;
+      });
+  };
+
+  const isStorePickupNow = (pickupTime: string) => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMin = now.getMinutes();
+    const currentTime = currentHour + currentMin / 60;
+
+    const range = parseTimeRange(pickupTime);
+    if (!range) return false;
+
+    // Handle day-specific logic if Today/Tomorrow is present
+    if (pickupTime.includes('Tomorrow') && now.getHours() < 24) return false; 
+
+    // Simple check: current time between start and end
+    // (This doesn't handle minutes perfectly, but consistent with hour-based range logic)
+    return currentHour >= range.start && currentHour < range.end;
+  };
+
+  const breakfastStores = filterByTimeRange(categoryFilteredStores, 6, 11);
+  const lunchStores = filterByTimeRange(categoryFilteredStores, 11, 15);
+  const dinnerStores = filterByTimeRange(categoryFilteredStores, 17, 22);
   const nowStores = categoryFilteredStores.filter(store => isStorePickupNow(store.pickupTime));
+  const bakedGoodsStores = categoryFilteredStores.filter(s => s.category === 'Baked Goods');
 
   const navigateToSection = (title: string, type: string) => {
     router.push({ 
@@ -79,7 +135,7 @@ export default function HomeScreen() {
       params: { 
         title, 
         filterType: type,
-        category: selectedCategory || '' // Pass selected category
+        category: selectedCategory || '' 
       } 
     });
   };
@@ -89,12 +145,11 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.locationContainer}>
              <Ionicons name="location-sharp" size={16} color={Colors.deepGreen} />
-             <Text style={[styles.locationText, { fontFamily: fonts.body }]}>Tuel Kork, Phnom Penh</Text>
-             <Ionicons name="chevron-down" size={16} color={Colors.deepGreen} />
+             <Text style={[styles.locationText, { fontFamily: fonts.body }]} numberOfLines={1}>{locationName}</Text>
         </View>
         <View style={styles.titleRow}>
             <Text style={styles.appTitle}>LoopIt</Text>
-            <TouchableOpacity style={styles.helpButton}>
+            <TouchableOpacity style={styles.helpButton} onPress={() => router.push('/how-it-works')}>
                 <Text style={[styles.helpText, { fontFamily: fonts.body }]}>{t('howItWorks')}</Text>
                 <Ionicons name="information-circle-outline" size={20} color={Colors.white} />
             </TouchableOpacity>
@@ -115,9 +170,9 @@ export default function HomeScreen() {
             onPress={() => navigateToSection("Recommended", "recommended")} 
         />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
-          {categoryFilteredStores.slice(0, 10).map((store) => (
+          {recommendedStores.length > 0 ? recommendedStores.slice(0, 10).map((store) => (
             <StoreCard key={store.id} store={store} containerStyle={{ width: cardWidth }} />
-          ))}
+          )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noRecommended')}</Text>}
         </ScrollView>
 
         <SectionHeader 
@@ -127,8 +182,22 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
             {nowStores.length > 0 ? nowStores.map((store) => (
             <StoreCard key={`now-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
-            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>No pickup options available right now.</Text>}
+            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noPickup')}</Text>}
         </ScrollView>
+
+        {bakedGoodsStores.length > 0 && (
+            <>
+                <SectionHeader 
+                    title={t('catBakedGoods')} 
+                    onPress={() => navigateToSection("Baked Goods", "baked")} 
+                />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
+                    {bakedGoodsStores.map((store) => (
+                    <StoreCard key={`baked-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
+                    ))}
+                </ScrollView>
+            </>
+        )}
 
         <SectionHeader 
             title={t('breakfast')} 
@@ -137,7 +206,7 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
             {breakfastStores.length > 0 ? breakfastStores.map((store) => (
             <StoreCard key={`breakfast-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
-            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>No breakfast pickup options available.</Text>}
+            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noBreakfast')}</Text>}
         </ScrollView>
 
         <SectionHeader 
@@ -147,7 +216,7 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
             {lunchStores.length > 0 ? lunchStores.map((store) => (
             <StoreCard key={`lunch-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
-            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>No lunch pickup options available.</Text>}
+            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noLunch')}</Text>}
         </ScrollView>
 
         <SectionHeader 
@@ -157,7 +226,7 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
             {dinnerStores.length > 0 ? dinnerStores.map((store) => (
             <StoreCard key={`dinner-${store.id}`} store={store} containerStyle={{ width: cardWidth }} />
-            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>No dinner pickup options available.</Text>}
+            )) : <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noDinner')}</Text>}
         </ScrollView>
         
         <View style={{ height: 40 }} />
@@ -168,7 +237,7 @@ export default function HomeScreen() {
              style={styles.activeOrderBanner}
              onPress={() => router.push({ 
                  pathname: "/order-success", 
-                 params: { storeId: activeOrders[0].storeId, orderId: activeOrders[0].id, view: 'true' } 
+                 params: { storeId: activeOrders[0].storeId, orderId: activeOrders[0]._id, view: 'true' } 
              })}
          >
              <View style={styles.bannerContent}>
@@ -206,6 +275,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     color: Colors.deepGreen,
     fontWeight: '600',
+    maxWidth: '80%',
   },
   titleRow: {
     flexDirection: 'row',
@@ -216,8 +286,7 @@ const styles = StyleSheet.create({
   appTitle: {
     fontSize: 28,
     color: Colors.deepGreen,
-    fontWeight: 'bold',
-    fontFamily: 'Recoleta',
+    fontFamily: 'RecoletaBold',
   },
   helpButton: {
       flexDirection: 'row',

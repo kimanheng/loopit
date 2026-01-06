@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { translations } from '../constants/Translations';
-import { Fonts } from '../constants/Colors'; // Default fonts
 
 type Language = 'en' | 'km' | 'zh';
 
@@ -25,12 +24,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return dict[key] || translations['en'][key] || key;
   };
 
-  const fonts = {
-    heading: language === 'km' ? 'NotoSerifKhmer' : (language === 'zh' ? 'NotoSansSCBold' : 'Recoleta'),
-    body: language === 'km' ? 'NotoSansKhmer' : (language === 'zh' ? 'NotoSansSCRegular' : 'GoogleSans'),
-  };
-
-  return (
+          const fonts = {
+            heading: language === 'km' ? 'NotoSerifKhmer' : (language === 'zh' ? 'NotoSansSCBold' : 'RecoletaBold'),
+            body: language === 'km' ? 'NotoSansKhmer' : (language === 'zh' ? 'NotoSansSCRegular' : 'GoogleSans'),
+          };  return (
     <LanguageContext.Provider value={{ language, setLanguage, t, fonts }}>
       {children}
     </LanguageContext.Provider>

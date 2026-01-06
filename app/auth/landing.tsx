@@ -23,7 +23,7 @@ export default function LandingScreen() {
             style={styles.logoImage} 
             resizeMode="contain"
           />
-          <Text style={[styles.appName, { fontFamily: 'Recoleta' }]}>LoopIt</Text>
+          <Text style={[styles.appName, { fontFamily: 'RecoletaBold' }]}>LoopIt</Text>
         </View>
         
         <View style={styles.sloganContainer}>

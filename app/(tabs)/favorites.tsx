@@ -1,12 +1,33 @@
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useFavorites } from '../../context/FavoritesContext';
 import StoreCard from '../../components/StoreCard';
 import { useLanguage } from '../../context/LanguageContext';
+import { calculateDistance, DEFAULT_USER_LOCATION, getCurrentLocation } from '../../utils/locationUtils';
 
 export default function FavoritesScreen() {
   const { favoriteStores } = useFavorites();
   const { t, fonts } = useLanguage();
+  const [userLocation, setUserLocation] = useState(DEFAULT_USER_LOCATION);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+    };
+    fetchLocation();
+  }, []);
+
+  const storesWithDistance = favoriteStores.map(store => ({
+    ...store,
+    distance: calculateDistance(
+      userLocation.latitude,
+      userLocation.longitude,
+      store.latitude,
+      store.longitude
+    )
+  }));
 
   if (favoriteStores.length === 0) {
     return (
@@ -21,7 +42,7 @@ export default function FavoritesScreen() {
     <View style={styles.listContainer}>
       <Text style={[styles.headerTitle, { fontFamily: fonts.heading }]}>{t('tabFavorites')}</Text>
       <FlatList
-        data={favoriteStores}
+        data={storesWithDistance}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
             <View style={styles.itemContainer}>

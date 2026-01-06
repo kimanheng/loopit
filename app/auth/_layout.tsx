@@ -5,8 +5,10 @@ export default function AuthLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="landing" />
       <Stack.Screen name="phone" />
+      <Stack.Screen name="password" />
       <Stack.Screen name="verify" />
       <Stack.Screen name="info" />
+      <Stack.Screen name="business-register" />
     </Stack>
   );
 }

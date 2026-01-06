@@ -4,20 +4,23 @@ import { useOrders } from '../../context/OrdersContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function MeScreen() {
   const { orders } = useOrders();
   const router = useRouter();
   const { t, fonts } = useLanguage();
+  const { user } = useAuth();
 
-  const moneySaved = orders.reduce((acc, o) => acc + (o.originalPrice - o.price), 0);
-  const co2Saved = orders.length * 2.5;
+  const validOrders = orders.filter(o => o.status !== 'cancelled');
+  const moneySaved = validOrders.reduce((acc, o) => acc + (o.originalPrice - o.price), 0);
+  const co2Saved = validOrders.length * 2.5;
 
   const handleOrderPress = (order: any) => {
       if (order.status === 'active') {
           router.push({
               pathname: "/order-success",
-              params: { storeId: order.storeId, orderId: order.id, view: 'true' }
+              params: { storeId: order.storeId, orderId: order._id, view: 'true' }
           });
       }
   };
@@ -25,7 +28,9 @@ export default function MeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { fontFamily: fonts.heading }]}>{t('myProfile')}</Text>
+        <Text style={[styles.headerTitle, { fontFamily: fonts.heading }]}>
+          {t('hello')}{user?.name ? `, ${user.name}` : ''}
+        </Text>
         <TouchableOpacity onPress={() => router.push('/settings')}>
             <Ionicons name="settings-outline" size={24} color={Colors.deepGreen} />
         </TouchableOpacity>
@@ -34,13 +39,13 @@ export default function MeScreen() {
       <View style={styles.statsContainer}>
            <View style={styles.statCard}>
                <Text style={[styles.statLabel, { fontFamily: fonts.heading }]}>{t('co2Avoided')}</Text>
-               <Ionicons name="leaf" size={40} color={Colors.deepGreen} style={styles.statIcon} />
+               <Ionicons name="leaf-outline" size={32} color={Colors.deepGreen} style={styles.statIcon} />
                <Text style={[styles.statValue, { fontFamily: fonts.heading }]}>{co2Saved.toFixed(1)}</Text>
                <Text style={[styles.statUnit, { fontFamily: fonts.body }]}>kg</Text>
            </View>
            <View style={styles.statCard}>
                <Text style={[styles.statLabel, { fontFamily: fonts.heading }]}>{t('moneySaved')}</Text>
-               <Ionicons name="cash-outline" size={40} color={Colors.deepGreen} style={styles.statIcon} />
+               <Ionicons name="cash-outline" size={32} color={Colors.deepGreen} style={styles.statIcon} />
                <Text style={[styles.statValue, { fontFamily: fonts.heading }]}>{Math.max(0, moneySaved).toFixed(2)}</Text>
                <Text style={[styles.statUnit, { fontFamily: fonts.body }]}>$</Text>
            </View>
@@ -49,7 +54,10 @@ export default function MeScreen() {
       <View style={styles.section}>
           <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { fontFamily: fonts.heading }]}>{t('orderHistory')}</Text>
-              <TouchableOpacity style={styles.seeAllBtn}>
+              <TouchableOpacity 
+                style={styles.seeAllBtn}
+                onPress={() => router.push('/order-history')}
+              >
                   <Text style={[styles.seeAllText, { fontFamily: fonts.body }]}>{t('seeAll')}</Text>
                   <Ionicons name="chevron-forward" size={16} color={Colors.deepGreen} />
               </TouchableOpacity>
@@ -59,8 +67,8 @@ export default function MeScreen() {
               <Text style={[styles.emptyText, { fontFamily: fonts.body }]}>{t('noOrders')}</Text>
           ) : (
               <FlatList
-                  data={orders.slice(0, 2)}
-                  keyExtractor={(item) => item.id}
+                  data={[...orders].reverse().slice(0, 2)}
+                  keyExtractor={(item) => item._id}
                   contentContainerStyle={styles.listContent}
                   renderItem={({ item }) => {
                       const Wrapper = item.status === 'active' ? TouchableOpacity : View;
@@ -88,18 +96,6 @@ export default function MeScreen() {
               />
           )}
       </View>
-
-      <View style={styles.bannerContainer}>
-        <View style={styles.bannerContent}>
-            <View style={{ flex: 1 }}>
-                <Text style={[styles.bannerTitle, { fontFamily: fonts.heading }]}>{t('businessSignUp')}</Text>
-                <Text style={[styles.bannerText, { fontFamily: fonts.body }]}>{t('joinLoopIt')}</Text>
-            </View>
-            <TouchableOpacity style={styles.bannerButton}>
-                 <Text style={[styles.bannerButtonText, { fontFamily: fonts.heading }]}>{t('signUpFoodBusiness')}</Text>
-            </TouchableOpacity>
-        </View>
-      </View>
     </View>
   );
 }
@@ -109,39 +105,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
     paddingTop: 60,
-  },
-  bannerContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 30,
-    marginTop: 10,
-  },
-  bannerContent: {
-      backgroundColor: Colors.lightGreen,
-      borderRadius: 12,
-      padding: 20,
-      flexDirection: 'column',
-  },
-  bannerTitle: {
-      fontSize: 18,
-      color: Colors.deepGreen,
-      marginBottom: 8,
-  },
-  bannerText: {
-      fontSize: 14,
-      color: Colors.deepGreen,
-      marginBottom: 16,
-      lineHeight: 20,
-  },
-  bannerButton: {
-      backgroundColor: Colors.deepGreen,
-      paddingVertical: 10,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-      alignSelf: 'flex-start',
-  },
-  bannerButtonText: {
-      color: Colors.white,
-      fontSize: 14,
   },
   header: {
       flexDirection: 'row',
@@ -171,11 +134,11 @@ const styles = StyleSheet.create({
       elevation: 2,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
   },
   statLabel: {
-      fontSize: 16,
+      fontSize: 14,
       color: Colors.black,
       marginBottom: 12,
       textAlign: 'center',
@@ -237,7 +200,7 @@ const styles = StyleSheet.create({
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
-      shadowRadius: 2,
+      shadowRadius: 4,
   },
   orderImage: {
       width: 60,

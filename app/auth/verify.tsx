@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -15,7 +15,7 @@ export default function VerifyScreen() {
   
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
-  const inputs = useRef<Array<TextInput | null>>([]);
+  const inputs = useRef<(TextInput | null)[]>([]);
 
   const handleVerify = () => {
     const fullCode = code.join('');
@@ -24,19 +24,12 @@ export default function VerifyScreen() {
       return;
     }
 
-    // Mock Verification Logic
-    // If phone ends with '000', treat as new user.
-    // Otherwise, treat as existing user.
-    
-    if (fullCode === '123456') { // Mock valid code
+    if (fullCode === '123456') { 
         if (phone?.endsWith('000')) {
-             // New User -> Go to Info
              router.push({ pathname: '/auth/info', params: { phone } });
         } else {
-             // Existing User -> Login
-             if (phone) signIn(phone);
-             // Navigation will be handled by the layout or manually here
-             router.replace('/(tabs)');
+             if (phone) signIn(phone, '123456'); // Dummy password for bypass
+             router.replace('/');
         }
     } else {
         setError(t('invalidCode'));
@@ -45,7 +38,6 @@ export default function VerifyScreen() {
 
   const handleChangeCode = (text: string, index: number) => {
     if (text.length > 1) {
-        // Handle paste? For now just take first char
         text = text[0];
     }
 
@@ -71,52 +63,66 @@ export default function VerifyScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={Colors.black} />
-        </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.scrollContent} bounces={false}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color={Colors.black} />
+            </TouchableOpacity>
 
-        <View style={styles.content}>
-          <Text style={[styles.title, { fontFamily: fonts.heading }]}>
-            {t('verifyCode')}
-          </Text>
-          
-          <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
-            {t('verifyDesc')} +855 {phone}
-          </Text>
+            <View style={styles.content}>
+                <View style={styles.headerSection}>
+                    <Text style={[styles.title, { fontFamily: fonts.heading }]}>
+                        {t('verifyCode')}
+                    </Text>
+                    <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
+                        {t('verifyDesc')} <Text style={styles.phoneText}>+855 {phone}</Text>
+                    </Text>
+                </View>
 
-          <View style={styles.codeContainer}>
-            {code.map((digit, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => inputs.current[index] = ref}
-                style={[styles.codeInput, { fontFamily: fonts.body }]}
-                keyboardType="number-pad"
-                maxLength={1}
-                value={digit}
-                onChangeText={(text) => handleChangeCode(text, index)}
-                onKeyPress={({ nativeEvent }) => {
-                    if (nativeEvent.key === 'Backspace') {
-                        handleBackspace(digit, index);
-                    }
-                }}
-              />
-            ))}
-          </View>
+                <View style={styles.form}>
+                    <View style={styles.codeContainer}>
+                        {code.map((digit, index) => (
+                        <TextInput
+                            key={index}
+                            ref={(ref) => inputs.current[index] = ref}
+                            style={[
+                                styles.codeInput, 
+                                { fontFamily: fonts.body },
+                                digit ? styles.codeInputActive : null,
+                                error ? styles.codeInputError : null
+                            ]}
+                            keyboardType="number-pad"
+                            maxLength={1}
+                            value={digit}
+                            onChangeText={(text) => handleChangeCode(text, index)}
+                            onKeyPress={({ nativeEvent }) => {
+                                if (nativeEvent.key === 'Backspace') {
+                                    handleBackspace(digit, index);
+                                }
+                            }}
+                        />
+                        ))}
+                    </View>
+                    {error ? <Text style={[styles.errorText, { fontFamily: fonts.body }]}>{error}</Text> : null}
+                    
+                    <TouchableOpacity style={styles.resendContainer}>
+                        <Text style={[styles.resendText, { fontFamily: fonts.body }]}>
+                            Didn&apos;t receive the code? <Text style={styles.resendLink}>{t('resendCode')}</Text>
+                        </Text>
+                    </TouchableOpacity>
+                </View>
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-          <TouchableOpacity style={styles.resendButton}>
-            <Text style={[styles.resendText, { fontFamily: fonts.body }]}>{t('resendCode')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.button, { opacity: code.join('').length === 6 ? 1 : 0.5 }]} 
-            onPress={handleVerify}
-            disabled={code.join('').length < 6}
-          >
-            <Text style={[styles.buttonText, { fontFamily: fonts.body }]}>{t('continue')}</Text>
-          </TouchableOpacity>
-        </View>
+                <View style={styles.footer}>
+                    <TouchableOpacity 
+                        style={[styles.button, { opacity: code.join('').length === 6 ? 1 : 0.5 }]} 
+                        onPress={handleVerify}
+                        disabled={code.join('').length < 6}
+                    >
+                        <Text style={[styles.buttonText, { fontFamily: fonts.body }]}>{t('continue')}</Text>
+                        <Ionicons name="arrow-forward" size={20} color={Colors.white} style={{ marginLeft: 8 }} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -130,23 +136,37 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   backButton: {
     padding: 16,
   },
   content: {
     flex: 1,
-    padding: 24,
-    paddingTop: 20,
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 40,
+  },
+  headerSection: {
+    marginBottom: 40,
   },
   title: {
     fontSize: 28,
-    marginBottom: 8,
     color: Colors.black,
+    marginBottom: 12,
   },
   subtitle: {
-    fontSize: 16,
-    color: Colors.gray,
-    marginBottom: 40,
+      fontSize: 16,
+      color: Colors.gray,
+      lineHeight: 22,
+  },
+  phoneText: {
+      color: Colors.black,
+      fontWeight: 'bold',
+  },
+  form: {
+      flex: 1,
   },
   codeContainer: {
     flexDirection: 'row',
@@ -154,33 +174,57 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   codeInput: {
-    width: 45,
-    height: 55,
-    borderWidth: 1,
+    width: 48,
+    height: 60,
+    borderWidth: 1.5,
     borderColor: Colors.lightGray,
-    borderRadius: 8,
+    borderRadius: 12,
     fontSize: 24,
     textAlign: 'center',
     color: Colors.black,
+    backgroundColor: '#FAFAFA',
+  },
+  codeInputActive: {
+      borderColor: Colors.deepGreen,
+      backgroundColor: Colors.white,
+  },
+  codeInputError: {
+      borderColor: Colors.red,
   },
   errorText: {
     color: Colors.red,
-    marginBottom: 10,
+    marginBottom: 20,
     fontSize: 14,
+    textAlign: 'center',
   },
-  resendButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 30,
+  resendContainer: {
+      alignItems: 'center',
+      marginTop: 10,
   },
   resendText: {
-    color: Colors.deepGreen,
-    fontSize: 16,
+    color: Colors.gray,
+    fontSize: 14,
+  },
+  resendLink: {
+      color: Colors.deepGreen,
+      fontWeight: 'bold',
+  },
+  footer: {
+      marginTop: 'auto',
   },
   button: {
     backgroundColor: Colors.deepGreen,
-    paddingVertical: 16,
-    borderRadius: 8,
+    height: 56,
+    borderRadius: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: Colors.deepGreen,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   buttonText: {
     color: Colors.white,

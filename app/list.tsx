@@ -1,23 +1,75 @@
+import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { View, StyleSheet, FlatList, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../constants/Colors';
-import { STORES } from '../data/mockData';
 import StoreCard from '../components/StoreCard';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+import { isTimeOver } from '../utils/timeUtils';
+import { calculateDistance, DEFAULT_USER_LOCATION, getCurrentLocation } from '../utils/locationUtils';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ListScreen() {
   const { filterType, title, category } = useLocalSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
+  const [userLocation, setUserLocation] = useState(DEFAULT_USER_LOCATION);
+
+  const rawStores = useQuery(api.stores.list);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+    };
+    fetchLocation();
+  }, []);
+
+  const getDistance = (distanceStr: string) => {
+    return parseFloat(distanceStr.replace(/[^0-9.]/g, ''));
+  };
+
+  const isSoldOut = (store: any) => {
+      return store.itemsLeft === 0 || isTimeOver(store.pickupTime);
+  };
+
+  const sortStores = (storesToSort: any[]) => {
+      return [...storesToSort].sort((a, b) => {
+          const soldOutA = isSoldOut(a);
+          const soldOutB = isSoldOut(b);
+
+          if (soldOutA !== soldOutB) {
+              return soldOutA ? 1 : -1; // Available first
+          }
+
+          const distA = getDistance(a.distance);
+          const distB = getDistance(b.distance);
+          return distA - distB;
+      });
+  };
+
+  const stores = sortStores((rawStores || []).map(s => ({ 
+      ...s, 
+      id: s._id,
+      distance: calculateDistance(
+          userLocation.latitude, 
+          userLocation.longitude, 
+          s.latitude, 
+          s.longitude
+      )
+  })));
 
   // 1. Filter by Category first (if provided)
-  let data = STORES;
+  let data = stores;
   if (category) {
-      data = STORES.filter(s => s.category === category);
+      data = stores.filter(s => s.category === category);
   }
 
   // 2. Filter by Type
-  if (filterType === 'lunch') {
+  if (filterType === 'recommended') {
+      data = data.filter(s => !isSoldOut(s));
+  } else if (filterType === 'lunch') {
     data = data.filter(s => {
        const time = s.pickupTime.toLowerCase();
        return time.includes('11:') || time.includes('12:') || time.includes('13:') || time.includes('14:');
@@ -90,7 +142,7 @@ export default function ListScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
             <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No stores found.</Text>
+                <Text style={styles.emptyText}>{t('noStoresFound')}</Text>
             </View>
         }
       />

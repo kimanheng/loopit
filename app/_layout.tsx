@@ -6,12 +6,17 @@ import { FavoritesProvider } from "../context/FavoritesContext";
 import { OrdersProvider } from "../context/OrdersContext";
 import { LanguageProvider } from "../context/LanguageContext";
 import { AuthProvider } from "../context/AuthContext";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 SplashScreen.preventAutoHideAsync();
 
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    'Recoleta': require('../assets/fonts/recoleta-bold.otf'), 
+    'RecoletaBold': require('../assets/fonts/recoleta-bold.otf'), 
     'GoogleSans': require('../assets/fonts/GoogleSans-Regular.ttf'),
     'NotoSerifKhmer': require('../assets/fonts/NotoSerifKhmer-Bold.ttf'), // Placeholder until real files added
     'NotoSansKhmer': require('../assets/fonts/NotoSansKhmer-Regular.ttf'), // Placeholder until real files added
@@ -26,19 +31,24 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <OrdersProvider>
-          <FavoritesProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="auth" options={{ headerShown: false }} />
-              <Stack.Screen name="store/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="list" options={{ title: 'All Stores', headerShown: true, headerBackTitle: 'Back' }} />
-            </Stack>
-          </FavoritesProvider>
-        </OrdersProvider>
-      </LanguageProvider>
-    </AuthProvider>
+    <ConvexProvider client={convex}>
+      <AuthProvider>
+        <LanguageProvider>
+          <OrdersProvider>
+            <FavoritesProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="business-profile" options={{ headerShown: false }} />
+                <Stack.Screen name="auth" options={{ headerShown: false }} />
+                <Stack.Screen name="store/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="list" options={{ title: 'All Stores', headerShown: true, headerBackTitle: 'Back' }} />
+                <Stack.Screen name="order-history" options={{ headerShown: false }} />
+              </Stack>
+            </FavoritesProvider>
+          </OrdersProvider>
+        </LanguageProvider>
+      </AuthProvider>
+    </ConvexProvider>
   );
 }

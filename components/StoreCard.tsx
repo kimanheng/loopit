@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'expo-router';
+import { isTimeOver } from '../utils/timeUtils';
 
 interface StoreCardProps {
   store: {
@@ -26,21 +27,29 @@ export default function StoreCard({ store, containerStyle }: StoreCardProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { t, fonts } = useLanguage();
   const favorite = isFavorite(store.id);
+  
+  const timeOver = isTimeOver(store.pickupTime);
+  const isSoldOut = store.itemsLeft === 0 || timeOver;
+  const shouldGrayOut = isSoldOut;
 
   return (
     <View style={[styles.shadowWrapper, containerStyle]}>
       <Link href={`/store/${store.id}`} asChild>
-        <Pressable style={styles.cardContent}>
+        <Pressable style={[styles.cardContent, shouldGrayOut && styles.cardDisabled]}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: store.image }} style={styles.image} />
+            <Image source={{ uri: store.image }} style={[styles.image, shouldGrayOut && styles.imageGrayscale]} />
             <View style={styles.logoContainer}>
-                <Image source={{ uri: store.logo }} style={styles.logo} />
+                <Image source={{ uri: store.logo }} style={[styles.logo, shouldGrayOut && styles.imageGrayscale]} />
             </View>
-            {store.itemsLeft <= 5 && (
+            {isSoldOut ? (
+                <View style={[styles.badge, styles.badgeSoldOut]}>
+                    <Text style={[styles.badgeText, { fontFamily: fonts.body }]}>{t('soldOut')}</Text>
+                </View>
+            ) : store.itemsLeft < 10 ? (
                 <View style={styles.badge}>
                     <Text style={[styles.badgeText, { fontFamily: fonts.body }]}>{store.itemsLeft} {t('left')}</Text>
                 </View>
-            )}
+            ) : null}
             <TouchableOpacity 
               style={styles.favoriteBtn} 
               onPress={(e) => {
@@ -84,7 +93,7 @@ export default function StoreCard({ store, containerStyle }: StoreCardProps) {
 const styles = StyleSheet.create({
   shadowWrapper: {
     width: 280, // Default width
-    height: 260,
+    // height: 260, // Removed fixed height to prevent clipping
     marginRight: 16,
     marginBottom: 12, // Space for shadow
     backgroundColor: Colors.white,
@@ -97,10 +106,14 @@ const styles = StyleSheet.create({
     elevation: 6, // Android
   },
   cardContent: {
-    flex: 1,
+    // flex: 1, // Removed to allow auto height
     backgroundColor: Colors.white,
     borderRadius: 12,
     overflow: 'hidden', // Clips the image
+    paddingBottom: 12, // Add padding at bottom since height is auto
+  },
+  cardDisabled: {
+      opacity: 0.6,
   },
   imageContainer: {
     height: 140,
@@ -110,6 +123,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  imageGrayscale: {
+      opacity: 0.8, // Optional: add grayscale filter if supported or just dim
+      backgroundColor: '#ccc',
   },
   logoContainer: {
     position: 'absolute',
@@ -138,6 +157,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
+  },
+  badgeSoldOut: {
+      backgroundColor: Colors.gray,
   },
   badgeText: {
     color: Colors.white,

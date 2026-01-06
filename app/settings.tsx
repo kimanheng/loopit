@@ -24,7 +24,7 @@ interface SettingsItem {
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t, fonts } = useLanguage();
-  const { signOut } = useAuth();
+  const { signOut, user, switchUserType } = useAuth();
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
   const SECTIONS: { title: string; items: SettingsItem[] }[] = [
@@ -49,7 +49,11 @@ export default function SettingsScreen() {
       items: [
         { id: 'help', labelKey: 'helpOrder', icon: 'briefcase-outline' },
         { id: 'how', labelKey: 'howItWorks', icon: 'help-circle-outline' },
-        { id: 'business', labelKey: 'signUpFoodBusiness', icon: 'storefront-outline' },
+        // Conditional Business Item
+        ...(user && user.hasBusinessAccount 
+            ? [{ id: 'switchType', labelKey: user.userType === 'consumer' ? 'switchToBusiness' : 'switchToConsumer', icon: 'swap-horizontal-outline' }]
+            : (user ? [{ id: 'business', labelKey: 'signUpFoodBusiness', icon: 'storefront-outline' }] : [])
+        ),
         { id: 'careers', labelKey: 'careers', icon: 'business-outline' },
       ]
     },
@@ -65,7 +69,14 @@ export default function SettingsScreen() {
   const handlePress = (item: SettingsItem) => {
     if (item.id === 'logout') {
       signOut();
-      router.replace('/auth/landing');
+    } else if (item.id === 'account') {
+      router.push('/account-details');
+    } else if (item.id === 'business') {
+      router.push('/auth/business-register');
+    } else if (item.id === 'how') {
+      router.push('/how-it-works');
+    } else if (item.id === 'switchType') {
+      switchUserType();
     } else if (item.isLanguage) {
       setShowLanguageOptions(!showLanguageOptions);
     }
