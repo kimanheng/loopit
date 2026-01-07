@@ -56,7 +56,7 @@ export default function AnalyticsScreen() {
                 <Ionicons name="leaf-outline" size={20} color={Colors.deepGreen} />
               </View>
               <Text style={[styles.statBoxValue, { fontFamily: fonts.heading }]}>{(analytics.itemsSaved * 2.5).toFixed(1)}kg</Text>
-              <Text style={[styles.statBoxLabel, { fontFamily: fonts.body }]}>{t('totalCO2eAvoided')}</Text>
+              <Text style={[styles.statBoxLabel, { fontFamily: fonts.body }]}>{t('co2Avoided')}</Text>
             </View>
             <View style={styles.statBox}>
               <View style={[styles.iconCircle, { backgroundColor: '#FFF3E0' }]}>

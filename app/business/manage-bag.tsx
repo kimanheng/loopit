@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
@@ -8,8 +9,6 @@ import { api } from '../../convex/_generated/api';
 import { Ionicons } from '@expo/vector-icons';
 import { Id } from '../../convex/_generated/dataModel';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ManageBagScreen() {
   const router = useRouter();
@@ -256,6 +255,8 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     marginBottom: 8,
+    height: 56,
+    textAlignVertical: 'center',
   },
   timeRow: {
       flexDirection: 'row',

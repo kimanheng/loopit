@@ -273,16 +273,17 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    // backgroundColor: Colors.white, // Removed
-    // padding: 4, // Removed
-    // borderWidth: 1, // Removed
-    // borderColor: Colors.lightGray, // Removed
+    backgroundColor: Colors.white,
+    padding: 2,
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    overflow: 'hidden',
   },
   logo: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 38,
-    resizeMode: 'contain',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    resizeMode: 'cover',
   },
   content: {
     paddingTop: 40,
@@ -384,20 +385,20 @@ const styles = StyleSheet.create({
       height: '100%',
   },
   customMarker: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: Colors.white,
-      padding: 2,
       borderWidth: 2,
       borderColor: Colors.deepGreen,
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'hidden',
   },
   markerImage: {
-      width: '100%',
-      height: '100%',
-      borderRadius: 18,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       resizeMode: 'cover',
   },
   locationDetailRow: {

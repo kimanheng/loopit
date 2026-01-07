@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
@@ -13,8 +14,6 @@ import MapView, { Marker } from 'react-native-maps';
 import OLC from 'open-location-code';
 
 const olc = new OLC.OpenLocationCode();
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CreateStoreScreen() {
   const router = useRouter();
@@ -297,6 +296,8 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     marginBottom: 8,
+    height: 56, // Fixed height for consistency
+    textAlignVertical: 'center', // Fix for Android text centering
   },
   categoryContainer: {
       flexDirection: 'row',
@@ -344,20 +345,20 @@ const styles = StyleSheet.create({
       height: '100%',
   },
   customMarker: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Colors.white,
-    padding: 2,
     borderWidth: 2,
     borderColor: Colors.deepGreen,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   markerImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     resizeMode: 'cover',
   },
   button: {

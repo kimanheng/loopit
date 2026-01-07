@@ -142,11 +142,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
     borderWidth: 1,
     borderColor: Colors.lightGray,
+    overflow: 'hidden', // Essential for Android
   },
   logo: {
     width: '100%',
     height: '100%',
-    borderRadius: 19,
+    borderRadius: 20, // Match container
     resizeMode: 'contain',
   },
   badge: {

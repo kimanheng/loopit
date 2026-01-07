@@ -160,7 +160,6 @@ export default function BrowseScreen() {
                         key={store._id}
                         coordinate={{ latitude: store.latitude!, longitude: store.longitude! }}
                         onPress={() => handleMarkerPress(store)}
-                        title={store.name}
                     >
                         <View style={styles.markerContainer}>
                             {store.logo ? (
@@ -218,24 +217,22 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       borderWidth: 1,
       borderColor: Colors.lightGray,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+      overflow: 'hidden',
   },
   markerImage: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44, // Match container for better clipping
+      height: 44,
+      borderRadius: 22,
       resizeMode: 'cover',
+      overflow: 'hidden',
   },
   defaultMarker: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: Colors.deepGreen,
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'hidden',
   },
 });

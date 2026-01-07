@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
@@ -7,8 +8,6 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Ionicons } from '@expo/vector-icons';
 import { Id } from '../../convex/_generated/dataModel';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function BusinessOrdersScreen() {
   const router = useRouter();

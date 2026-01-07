@@ -12,10 +12,6 @@ export default function BusinessRegisterScreen() {
   const { t, fonts } = useLanguage();
   const { registerBusiness } = useAuth();
   
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-
   const [businessName, setBusinessName] = useState('');
   const [storeType, setStoreType] = useState('');
   const [showStoreTypes, setShowStoreTypes] = useState(false);
@@ -25,66 +21,6 @@ export default function BusinessRegisterScreen() {
   const [contactNumber, setContactNumber] = useState('+855');
 
   const STORE_TYPES = ['Cafe', 'Restaurant', 'Bakery', 'Grocery', 'Other'];
-
-  // Mock function to simulate Google Places API search
-  const handleSearch = async (text: string) => {
-    setSearchQuery(text);
-    if (text.length > 2) {
-      setIsSearching(true);
-      // Simulate API delay
-      setTimeout(() => {
-        // Mock results
-        if (text.toLowerCase().includes('coffee')) {
-          setSearchResults([
-            {
-              id: '1',
-              name: 'Best Coffee Phnom Penh',
-              types: ['Cafe'],
-              formatted_address: '#123, St 456, Sangkat Toul Tom Poung, Phnom Penh',
-              sangkat: 'Toul Tom Poung',
-              city: 'Phnom Penh',
-            },
-            {
-                id: '2',
-                name: 'LoopIt Coffee',
-                types: ['Cafe'],
-                formatted_address: '#1, St 1, Sangkat Daun Penh, Phnom Penh',
-                sangkat: 'Daun Penh',
-                city: 'Phnom Penh',
-            }
-          ]);
-        } else {
-            setSearchResults([]);
-        }
-        setIsSearching(false);
-      }, 1000);
-    } else {
-      setSearchResults([]);
-    }
-  };
-
-  const selectBusiness = (business: any) => {
-    setBusinessName(business.name);
-    // Map Google types to our types if possible, or default to Other
-    const mappedType = STORE_TYPES.find(t => business.types.some((bt: string) => bt.toLowerCase().includes(t.toLowerCase()))) || 'Other';
-    setStoreType(mappedType);
-    
-    // Simple parsing logic for the mock data
-    const parts = business.formatted_address.split(', ');
-    if (parts.length >= 3) {
-        setStreet(parts[0] + ', ' + parts[1]);
-        // parts[2] might be Sangkat
-        if (parts[2].includes('Sangkat')) {
-            setSangkat(parts[2].replace('Sangkat ', ''));
-        } else {
-             setSangkat(parts[2]);
-        }
-    }
-    
-    setCity('Phnom Penh'); // Always Phnom Penh per requirement
-    setSearchResults([]);
-    setSearchQuery('');
-  };
 
   const handleRegister = () => {
     // Handle registration logic here
@@ -117,33 +53,6 @@ export default function BusinessRegisterScreen() {
 
         <ScrollView contentContainerStyle={styles.content}>
           
-          <View style={styles.section}>
-            <Text style={[styles.label, { fontFamily: fonts.body }]}>{t('searchBusiness')}</Text>
-            <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color={Colors.gray} style={styles.searchIcon} />
-                <TextInput
-                style={[styles.searchInput, { fontFamily: fonts.body }]}
-                placeholder={t('searchBusiness')}
-                value={searchQuery}
-                onChangeText={handleSearch}
-                />
-                {isSearching && <ActivityIndicator size="small" color={Colors.deepGreen} />}
-            </View>
-            
-            {searchResults.length > 0 && (
-                <View style={styles.resultsContainer}>
-                    {searchResults.map((item) => (
-                        <TouchableOpacity key={item.id} style={styles.resultItem} onPress={() => selectBusiness(item)}>
-                            <Text style={[styles.resultName, { fontFamily: fonts.body }]}>{item.name}</Text>
-                            <Text style={[styles.resultAddress, { fontFamily: fonts.body }]}>{item.formatted_address}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            )}
-          </View>
-
-          <Text style={[styles.dividerText, { fontFamily: fonts.body }]}>{t('manualEntry')}</Text>
-
           <View style={styles.inputContainer}>
             <Text style={[styles.label, { fontFamily: fonts.body }]}>{t('businessName')}</Text>
             <TextInput
@@ -261,55 +170,6 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 40,
   },
-  section: {
-    marginBottom: 20,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.lightGray,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: Colors.offWhite,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.black,
-  },
-  resultsContainer: {
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: Colors.lightGray,
-    borderRadius: 8,
-    backgroundColor: Colors.white,
-    maxHeight: 200,
-  },
-  resultItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGray,
-  },
-  resultName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.black,
-  },
-  resultAddress: {
-    fontSize: 14,
-    color: Colors.gray,
-  },
-  dividerText: {
-    textAlign: 'center',
-    color: Colors.gray,
-    marginBottom: 20,
-    fontSize: 14,
-  },
   inputContainer: {
     marginBottom: 20,
   },
@@ -325,6 +185,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     color: Colors.black,
     fontFamily: 'GoogleSans',
+    height: 50,
+    textAlignVertical: 'center',
   },
   button: {
     marginTop: 20,
