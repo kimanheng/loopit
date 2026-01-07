@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator, Linking, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Linking, Platform, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
@@ -268,22 +269,31 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     position: 'absolute',
-    bottom: -30,
+    bottom: -35,
     left: 20,
     width: 80,
     height: 80,
     borderRadius: 40,
     backgroundColor: Colors.white,
-    padding: 2,
     borderWidth: 1,
     borderColor: Colors.lightGray,
     overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Add shadow for better depth
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: '100%',
+    height: '100%',
     borderRadius: 40,
-    resizeMode: 'cover',
   },
   content: {
     paddingTop: 40,

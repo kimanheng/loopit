@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { StyleSheet, View, Text, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';

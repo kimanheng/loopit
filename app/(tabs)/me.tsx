@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Colors } from '../../constants/Colors';
 import { useOrders } from '../../context/OrdersContext';
 import { Ionicons } from '@expo/vector-icons';

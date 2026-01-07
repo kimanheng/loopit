@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
@@ -138,17 +139,17 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: Colors.white,
-    padding: 2,
     zIndex: 10,
     borderWidth: 1,
     borderColor: Colors.lightGray,
     overflow: 'hidden', // Essential for Android
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
     width: '100%',
     height: '100%',
     borderRadius: 20, // Match container
-    resizeMode: 'contain',
   },
   badge: {
     position: 'absolute',
