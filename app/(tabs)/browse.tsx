@@ -164,7 +164,7 @@ export default function BrowseScreen() {
                     >
                         <View style={styles.markerContainer}>
                             {store.logo ? (
-                                <Image source={{ uri: store.logo }} style={styles.markerImage} />
+                                <Image source={{ uri: store.logo }} style={styles.markerImage} contentFit="cover" />
                             ) : (
                                 <View style={styles.defaultMarker}>
                                     <Ionicons name="storefront" size={20} color={Colors.white} />
@@ -224,7 +224,6 @@ const styles = StyleSheet.create({
       width: 44, // Match container for better clipping
       height: 44,
       borderRadius: 22,
-      resizeMode: 'cover',
       overflow: 'hidden',
   },
   defaultMarker: {

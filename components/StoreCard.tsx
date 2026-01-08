@@ -38,9 +38,9 @@ export default function StoreCard({ store, containerStyle }: StoreCardProps) {
       <Link href={`/store/${store.id}`} asChild>
         <Pressable style={[styles.cardContent, shouldGrayOut && styles.cardDisabled]}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: store.image }} style={[styles.image, shouldGrayOut && styles.imageGrayscale]} />
+            <Image source={{ uri: store.image }} style={[styles.image, shouldGrayOut && styles.imageGrayscale]} contentFit="cover" />
             <View style={styles.logoContainer}>
-                <Image source={{ uri: store.logo }} style={[styles.logo, shouldGrayOut && styles.imageGrayscale]} />
+                <Image source={{ uri: store.logo }} style={[styles.logo, shouldGrayOut && styles.imageGrayscale]} contentFit="cover" />
             </View>
             {isSoldOut ? (
                 <View style={[styles.badge, styles.badgeSoldOut]}>
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },

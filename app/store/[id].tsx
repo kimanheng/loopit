@@ -63,12 +63,12 @@ export default function StoreDetails() {
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
             <View style={styles.imageHeader}>
-                <Image source={{ uri: store.image }} style={[styles.image, isSoldOut && styles.imageGrayscale]} />
+                <Image source={{ uri: store.image }} style={[styles.image, isSoldOut && styles.imageGrayscale]} contentFit="cover" />
                 <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color={Colors.white} />
                 </TouchableOpacity>
                  <View style={styles.logoContainer}>
-                    <Image source={{ uri: store.logo }} style={[styles.logo, isSoldOut && styles.imageGrayscale]} />
+                    <Image source={{ uri: store.logo }} style={[styles.logo, isSoldOut && styles.imageGrayscale]} contentFit="cover" />
                 </View>
             </View>
 
@@ -133,7 +133,7 @@ export default function StoreDetails() {
                                 }}
                             >
                                 <View style={styles.customMarker}>
-                                    <Image source={{ uri: store.logo }} style={styles.markerImage} />
+                                    <Image source={{ uri: store.logo }} style={styles.markerImage} contentFit="cover" />
                                 </View>
                             </Marker>
                         </MapView>
@@ -250,7 +250,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   imageGrayscale: {
       opacity: 0.8,
@@ -409,7 +408,6 @@ const styles = StyleSheet.create({
       width: 44,
       height: 44,
       borderRadius: 22,
-      resizeMode: 'cover',
   },
   locationDetailRow: {
       flexDirection: 'row',

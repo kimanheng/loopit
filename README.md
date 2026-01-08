@@ -1,50 +1,82 @@
-# Welcome to your Expo app 👋
+# LoopIt
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+LoopIt is a sustainable food marketplace mobile application built with React Native (Expo) and Convex. It connects businesses with surplus food to consumers who can purchase it at a discounted price, reducing food waste.
 
-## Get started
+## Features
 
-1. Install dependencies
+-   **Browse Stores**: Discover local businesses offering surplus food.
+-   **Categories**: Filter by Meals, Baked Goods, Groceries, and Vegan options.
+-   **Orders**: Reserve "Magic Bags" or specific items for pickup.
+-   **Business Dashboard**: Businesses can manage their store profile, inventory, and view analytics.
+-   **Localization**: Full support for English, Khmer, and Chinese.
+-   **Favorites**: Save favorite stores for quick access.
+-   **Map View**: Find stores near you using the integrated map.
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+-   **Frontend**: React Native, Expo, Expo Router
+-   **Backend**: Convex (Real-time database and backend functions)
+-   **Language**: TypeScript
+-   **State Management**: React Context (Auth, Favorites, Language, Orders)
+-   **Maps**: `react-native-maps`, `open-location-code`
 
-   ```bash
-   npx expo start
-   ```
+## Prerequisites
 
-In the output, you'll find options to open the app in a
+-   Node.js (LTS recommended)
+-   npm or yarn
+-   Expo Go app on your mobile device (or Android Studio/Xcode for simulation)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Installation
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd LoopIt
+    ```
 
-## Get a fresh project
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-When you're ready, run:
+## Backend Setup (Convex)
+
+1.  Initialize Convex:
+    ```bash
+    npx convex dev
+    ```
+    This will set up your backend deployment and generate the necessary API types.
+
+## Running the App
+
+1.  Start the Expo development server:
+    ```bash
+    npx expo start
+    ```
+
+2.  Scan the QR code with:
+    -   **Android**: Expo Go app.
+    -   **iOS**: Camera app (if using Expo Go).
+
+## Testing
+
+Run the test suite using Jest:
 
 ```bash
-npm run reset-project
+npm test
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Localization
 
-## Learn more
+The app supports multiple languages. Translation files and context are located in:
+-   `context/LanguageContext.tsx`
+-   `constants/Translations.ts`
 
-To learn more about developing your project with Expo, look at the following resources:
+## Folder Structure
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+-   `app/`: Expo Router pages and layouts.
+-   `components/`: Reusable UI components.
+-   `convex/`: Backend schema and functions.
+-   `constants/`: App constants (Colors, Translations).
+-   `context/`: React Context providers.
+-   `utils/`: Utility functions.

@@ -211,6 +211,7 @@ export default function CreateStoreScreen() {
                                             <Image 
                                                 source={{ uri: selectedLogo }} 
                                                 style={styles.markerImage} 
+                                                contentFit="cover"
                                             />
                                         ) : (
                                             <Ionicons name="storefront" size={24} color={Colors.deepGreen} />
@@ -360,7 +361,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    resizeMode: 'cover',
   },
   button: {
     backgroundColor: Colors.deepGreen,

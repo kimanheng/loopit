@@ -45,5 +45,9 @@ app-example
 /android
 
 # Convex
-convex/_generated/
 .convex/
+
+# tests
+__tests__/
+tests/
+coverage/

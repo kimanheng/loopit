@@ -88,7 +88,7 @@ export default function OrderSuccessScreen() {
                         {store?.latitude && store?.longitude && (
                             <Marker coordinate={{ latitude: store.latitude, longitude: store.longitude }}>
                                 <View style={styles.customMarker}>
-                                    <Image source={{ uri: store.logo }} style={styles.markerImage} />
+                                    <Image source={{ uri: store.logo }} style={styles.markerImage} contentFit="cover" />
                                 </View>
                             </Marker>
                         )}
@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
       width: '100%',
       height: '100%',
       borderRadius: 13,
-      resizeMode: 'cover',
   },
   locationDetailRow: {
       flexDirection: 'row',

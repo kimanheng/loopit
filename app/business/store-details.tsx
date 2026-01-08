@@ -228,6 +228,7 @@ export default function StoreDetailsScreen() {
                                         <Image 
                                             source={{ uri: selectedLogo || logo }} 
                                             style={styles.markerImage} 
+                                            contentFit="cover"
                                         />
                                     </View>
                                 </Marker>
@@ -374,7 +375,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    resizeMode: 'cover',
   },
   helperText: {
       color: Colors.gray,
