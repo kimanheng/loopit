@@ -55,7 +55,7 @@ export default function OrderHistoryScreen() {
                     onPress={item.status === 'active' ? () => handleOrderPress(item) : undefined}
                     activeOpacity={0.7}
                   >
-                       <Image source={{ uri: item.storeImage }} style={styles.orderImage} />
+                       <Image source={{ uri: item.storeImage || undefined }} style={styles.orderImage} />
                        <View style={styles.orderInfo}>
                            <Text style={[styles.storeName, { fontFamily: fonts.body }]}>{item.storeName}</Text>
                            <Text style={[styles.orderDate, { fontFamily: fonts.body }]}>{item.pickupTime}</Text>

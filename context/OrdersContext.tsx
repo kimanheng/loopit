@@ -8,7 +8,7 @@ export interface Order {
   userId: string;
   storeId: string;
   storeName: string;
-  storeImage: string;
+  storeImage?: string | null;
   pickupTime: string;
   date: string;
   status: string;
@@ -21,7 +21,7 @@ export interface Order {
 interface CreateOrderData {
   storeId: string;
   storeName: string;
-  storeImage: string;
+  storeImage?: string;
   pickupTime: string;
   price: number;
   originalPrice: number;
@@ -53,7 +53,6 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
         userId: user._id as any,
         storeId: orderData.storeId as any,
         storeName: orderData.storeName,
-        storeImage: orderData.storeImage,
         pickupTime: orderData.pickupTime,
         price: orderData.price,
         originalPrice: orderData.originalPrice,

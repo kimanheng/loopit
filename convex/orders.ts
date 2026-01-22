@@ -6,7 +6,6 @@ export const createOrder = mutation({
     userId: v.id("users"),
     storeId: v.id("stores"),
     storeName: v.string(),
-    storeImage: v.optional(v.string()),
     pickupTime: v.string(),
     price: v.number(),
     originalPrice: v.number(),
@@ -16,12 +15,12 @@ export const createOrder = mutation({
     // Generate a random 4-digit code
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     const date = new Date().toISOString();
+    const now = Date.now();
 
     const orderId = await ctx.db.insert("orders", {
       userId: args.userId,
       storeId: args.storeId,
       storeName: args.storeName,
-      storeImage: args.storeImage,
       pickupTime: args.pickupTime,
       date,
       status: "active",
@@ -29,6 +28,8 @@ export const createOrder = mutation({
       originalPrice: args.originalPrice,
       items: args.items,
       code,
+      createdAt: now,
+      updatedAt: now,
     });
     
     // Decrease items left in store
@@ -44,11 +45,26 @@ export const createOrder = mutation({
 export const getUserOrders = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const orders = await ctx.db
       .query("orders")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .order("desc") // Newest first
       .collect();
+
+    // Enrich with store image
+    return await Promise.all(
+      orders.map(async (order) => {
+        const store = await ctx.db.get(order.storeId);
+        let storeImage = null;
+        if (store && store.imageStorageId) {
+          storeImage = await ctx.storage.getUrl(store.imageStorageId);
+        }
+        return {
+          ...order,
+          storeImage,
+        };
+      })
+    );
   },
 });
 
@@ -65,10 +81,16 @@ export const getStoreOrders = query({
     const ordersWithUser = await Promise.all(
       orders.map(async (order) => {
         const user = await ctx.db.get(order.userId);
+        let phoneNumber = "";
+        if (user) {
+          // Get phone number from the associated account
+          const account = await ctx.db.get(user.accountId);
+          phoneNumber = account?.phoneNumber || "";
+        }
         return {
           ...order,
           customer: user
-            ? { name: user.name || "Unknown", phoneNumber: user.phoneNumber }
+            ? { name: user.name || "Unknown", phoneNumber }
             : { name: "Unknown", phoneNumber: "" },
         };
       })

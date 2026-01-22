@@ -79,12 +79,12 @@ export default function MeScreen() {
                         onPress={item.status === 'active' ? () => handleOrderPress(item) : undefined}
                         activeOpacity={0.7}
                       >
-                           <Image source={{ uri: item.storeImage }} style={styles.orderImage} />
+                           <Image source={{ uri: item.storeImage || undefined }} style={styles.orderImage} />
                            <View style={styles.orderInfo}>
                                <Text style={[styles.storeName, { fontFamily: fonts.body }]}>{item.storeName}</Text>
                                <Text style={[styles.orderDate, { fontFamily: fonts.body }]}>{item.pickupTime}</Text>
                                <View style={[styles.statusBadge, item.status === 'active' ? styles.activeBadge : styles.completedBadge]}>
-                                   <Text style={[styles.statusText, { fontFamily: fonts.body }, item.status === 'active' ? styles.activeText : styles.completedText]}>{item.status}</Text>
+                                   <Text style={[styles.statusText, { fontFamily: fonts.body }, item.status === 'active' ? styles.activeText : styles.completedText]}>{item.status === 'active' ? t('statusActive') : t('statusCompleted')}</Text>
                                </View>
                            </View>
                            <View style={styles.priceColumn}>
