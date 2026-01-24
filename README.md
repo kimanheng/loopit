@@ -58,14 +58,6 @@ LoopIt is a sustainable food marketplace mobile application built with React Nat
     -   **Android**: Expo Go app.
     -   **iOS**: Camera app (if using Expo Go).
 
-## Testing
-
-Run the test suite using Jest:
-
-```bash
-npm test
-```
-
 ## Localization
 
 The app supports multiple languages. Translation files and context are located in:

@@ -71,7 +71,7 @@ export const get = query({
 });
 
 export const getMyStore = query({
-  args: { ownerId: v.id("accounts") },
+  args: { ownerId: v.id("merchants") },
   handler: async (ctx, args) => {
     const store = await ctx.db
       .query("stores")
@@ -100,7 +100,7 @@ export const getMyStore = query({
 
 export const createStore = mutation({
   args: {
-    ownerId: v.id("accounts"),
+    ownerId: v.id("merchants"),
     name: v.string(),
     category: v.string(),
     latitude: v.number(),

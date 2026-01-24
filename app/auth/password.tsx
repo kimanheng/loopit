@@ -21,9 +21,9 @@ export default function PasswordScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Check if user exists by phone number
-  const accountExists = useQuery(api.auth.checkAccount, phone ? { phoneNumber: phone } : "skip");
-  const isQueryLoading = accountExists === undefined;
-  const isNewUser = accountExists === false;
+  const existingUser = useQuery(api.users.getUserByPhoneNumber, phone ? { phoneNumber: phone } : "skip");
+  const isQueryLoading = existingUser === undefined;
+  const isNewUser = existingUser === null;
 
   const handleContinue = async () => {
     if (password.length < 6) {
@@ -117,7 +117,7 @@ export default function PasswordScreen() {
                     <TouchableOpacity 
                         style={[styles.button, { opacity: password.length >= 6 ? 1 : 0.5 }]} 
                         onPress={handleContinue}
-                        disabled={password.length < 6 || loading || accountExists === undefined}
+                        disabled={password.length < 6 || loading || existingUser === undefined}
                     >
                         {loading || isQueryLoading ? (
                           <ActivityIndicator color={Colors.white} />

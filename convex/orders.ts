@@ -35,7 +35,7 @@ export const createOrder = mutation({
     // Decrease items left in store
     const store = await ctx.db.get(args.storeId);
     if (store && store.itemsLeft > 0) {
-        await ctx.db.patch(args.storeId, { itemsLeft: store.itemsLeft - args.items });
+        await ctx.db.patch(args.storeId, { itemsLeft: Math.max(0, store.itemsLeft - args.items) });
     }
 
     return { orderId, code };
@@ -81,16 +81,10 @@ export const getStoreOrders = query({
     const ordersWithUser = await Promise.all(
       orders.map(async (order) => {
         const user = await ctx.db.get(order.userId);
-        let phoneNumber = "";
-        if (user) {
-          // Get phone number from the associated account
-          const account = await ctx.db.get(user.accountId);
-          phoneNumber = account?.phoneNumber || "";
-        }
         return {
           ...order,
           customer: user
-            ? { name: user.name || "Unknown", phoneNumber }
+            ? { name: user.name || "Unknown", phoneNumber: user.phoneNumber }
             : { name: "Unknown", phoneNumber: "" },
         };
       })

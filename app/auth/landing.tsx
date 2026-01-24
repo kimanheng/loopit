@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { Colors, Fonts } from '../../constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LandingScreen() {
   const router = useRouter();
@@ -28,9 +29,42 @@ export default function LandingScreen() {
         </View>
         
         <View style={styles.sloganContainer}>
-          <Text style={[styles.slogan, { fontFamily: fonts.heading }]}>
-            {t('slogan')}
+          <Text style={[styles.slogan, { fontFamily: fonts.heading, color: Colors.black, marginBottom: 0 }]}>
+            {t('sloganLine1')}
           </Text>
+          <Text style={[styles.slogan, { fontFamily: fonts.heading, color: Colors.deepGreen }]}>
+            {t('sloganLine2')}
+          </Text>
+        </View>
+
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureRow}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="leaf-outline" size={24} color={Colors.deepGreen} />
+            </View>
+            <View style={styles.featureText}>
+              <Text style={[styles.featureTitle, { fontFamily: fonts.body }]}>{t('hiwStep1Title')}</Text>
+              <Text style={[styles.featureDesc, { fontFamily: fonts.body }]}>{t('hiwStep1Desc')}</Text>
+            </View>
+          </View>
+          <View style={styles.featureRow}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="cash-outline" size={24} color={Colors.deepGreen} />
+            </View>
+            <View style={styles.featureText}>
+              <Text style={[styles.featureTitle, { fontFamily: fonts.body }]}>{t('hiwStep2Title')}</Text>
+              <Text style={[styles.featureDesc, { fontFamily: fonts.body }]}>{t('hiwStep2Desc')}</Text>
+            </View>
+          </View>
+          <View style={styles.featureRow}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="restaurant-outline" size={24} color={Colors.deepGreen} />
+            </View>
+            <View style={styles.featureText}>
+              <Text style={[styles.featureTitle, { fontFamily: fonts.body }]}>{t('hiwStep3Title')}</Text>
+              <Text style={[styles.featureDesc, { fontFamily: fonts.body }]}>{t('hiwStep3Desc')}</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.languageContainer}>
@@ -91,24 +125,62 @@ const styles = StyleSheet.create({
     color: Colors.deepGreen,
   },
   sloganContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   slogan: {
-    fontSize: 32,
+    fontSize: 28,
     textAlign: 'center',
     color: Colors.deepGreen,
-    lineHeight: 40,
+    lineHeight: 36,
+    marginBottom: 12,
+  },
+  subSlogan: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: Colors.gray,
+    lineHeight: 22,
+  },
+  featuresContainer: {
+    gap: 16,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    padding: 16,
+    borderRadius: 12,
+  },
+  featureIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#E8F5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  featureText: {
+    flex: 1,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.black,
+    marginBottom: 2,
+  },
+  featureDesc: {
+    fontSize: 14,
+    color: Colors.gray,
   },
   languageContainer: {
-    marginBottom: 40,
+    marginBottom: 20,
     alignItems: 'center',
   },
   selectLanguage: {
     fontSize: 16,
     color: Colors.gray,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   languageButtons: {
     flexDirection: 'row',

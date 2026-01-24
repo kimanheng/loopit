@@ -113,7 +113,8 @@ export const translations = {
     noStoresFound: 'No stores found.',
 
     // Auth
-    slogan: 'Eat like King.\nPay like Student.',
+    sloganLine1: 'Rescue Food,',
+    sloganLine2: 'Save Money.',
     selectLanguage: 'Select Language',
     enterPhone: 'Enter Your Phone Number',
     verifyCode: 'Enter Verification Code',
@@ -302,7 +303,8 @@ export const translations = {
     noStoresFound: 'រកមិនឃើញហាងទេ។',
 
     // Auth
-    slogan: 'ញ៉ាំដូចស្តេច\nបង់ដូចនិស្សិត',
+    sloganLine1: 'សង្គ្រោះអាហារ,',
+    sloganLine2: 'សន្សំថវិកា.',
     selectLanguage: 'ជ្រើសរើសភាសា',
     enterPhone: 'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក',
     verifyCode: 'បញ្ចូលលេខកូដផ្ទៀងផ្ទាត់',
@@ -491,7 +493,8 @@ export const translations = {
     noStoresFound: '未找到商店。',
 
     // Auth
-    slogan: '像国王一样吃\n像学生一样付',
+    sloganLine1: '拯救食物，',
+    sloganLine2: '节省金钱。',
     selectLanguage: '选择语言',
     enterPhone: '输入您的电话号码',
     verifyCode: '输入验证码',

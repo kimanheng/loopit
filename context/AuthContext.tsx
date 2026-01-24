@@ -48,8 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const convexUser = useQuery(api.users.getUserByPhoneNumber, phoneNumber ? { phoneNumber } : "skip");
-  const signUpMutation = useMutation(api.auth.signUp);
-  const signInMutation = useMutation(api.auth.signIn);
+  const signUpMutation = useMutation(api.auth.signUpCustomer);
+  const signInMutation = useMutation(api.auth.signInCustomer);
   const updateUserMutation = useMutation(api.users.updateUser);
 
   const signIn = async (phone: string, password: string) => {
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Customer app always registers as customer
   const signUp = async (phone: string, password: string) => {
     try {
-      await signUpMutation({ phoneNumber: phone, password, role: 'customer' });
+      await signUpMutation({ phoneNumber: phone, password });
       setPhoneNumber(phone);
       await AsyncStorage.setItem('user_phone', phone);
     } catch (e) {
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const user: User | null = convexUser ? { 
     _id: convexUser._id, 
-    accountId: convexUser.accountId,
+    accountId: convexUser._id,
     phoneNumber: convexUser.phoneNumber,
     name: convexUser.name,
     email: convexUser.email,
