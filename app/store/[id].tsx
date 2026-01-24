@@ -16,7 +16,6 @@ export default function StoreDetails() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, fonts } = useLanguage();
-  const { user } = useAuth();
   const [userLocation, setUserLocation] = useState(DEFAULT_USER_LOCATION);
   
   const store = useQuery(api.stores.get, { id: id as any });
@@ -38,7 +37,7 @@ export default function StoreDetails() {
   }
 
   if (store === null) {
-    return <View><Text>Store not found</Text></View>;
+    return <View><Text>{t('storeNotFound')}</Text></View>;
   }
 
   const timeOver = isTimeOver(store.pickupTime);
@@ -91,7 +90,7 @@ export default function StoreDetails() {
                     </View>
                     <View style={styles.ratingRow}>
                         <Ionicons name="star" size={16} color={Colors.deepGreen} />
-                        <Text style={[styles.rating, { fontFamily: fonts.body }]}>{store.rating} (50+ ratings)</Text>
+                        <Text style={[styles.rating, { fontFamily: fonts.body }]}>{store.rating} ({t('ratingsCount')})</Text>
                         <Text style={styles.dot}>•</Text>
                         <Text style={[styles.category, { fontFamily: fonts.body }]}>{t(`cat${store.category.replace(/\s+/g, '')}` as any) || store.category}</Text>
                         <Text style={styles.dot}>•</Text>
@@ -148,7 +147,7 @@ export default function StoreDetails() {
                      {store.plusCode && (
                         <View style={styles.locationDetailRow}>
                             <Ionicons name="map-outline" size={16} color={Colors.gray} />
-                            <Text style={[styles.plusCode, { fontFamily: fonts.body }]}>Plus Code: {store.plusCode}</Text>
+                            <Text style={[styles.plusCode, { fontFamily: fonts.body }]}>{t('plusCodeLabel')}: {store.plusCode}</Text>
                         </View>
                     )}
                     <TouchableOpacity style={styles.directionsBtn} onPress={openDirections}>
@@ -211,13 +210,9 @@ export default function StoreDetails() {
             <TouchableOpacity 
                 style={[
                     styles.reserveButton, 
-                    (isSoldOut || user?.userType === 'business') && styles.reserveButtonDisabled
+                    isSoldOut && styles.reserveButtonDisabled
                 ]}
                 onPress={() => {
-                    if (user?.userType === 'business') {
-                        Alert.alert(t('businessAccount'), t('businessNoReserve'));
-                        return;
-                    }
                     if (!isSoldOut) {
                         router.push({ pathname: "/reserve/[id]", params: { id: store._id } });
                     }
@@ -225,7 +220,7 @@ export default function StoreDetails() {
                 disabled={isSoldOut}
             >
                 <Text style={[styles.reserveButtonText, { fontFamily: fonts.body }]}>
-                    {isSoldOut ? 'Sold Out' : t('reserve')}
+                    {isSoldOut ? t('soldOut') : t('reserve')}
                 </Text>
             </TouchableOpacity>
         </View>

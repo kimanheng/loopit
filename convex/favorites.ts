@@ -39,6 +39,7 @@ export const toggleFavorite = mutation({
       await ctx.db.insert("favorites", {
         userId: args.userId,
         storeId: args.storeId,
+        createdAt: Date.now(),
       });
       return true; // Added
     }

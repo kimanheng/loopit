@@ -33,7 +33,7 @@ export default function FavoritesScreen() {
     return (
         <View style={styles.container}>
             <Text style={[styles.text, { fontFamily: fonts.heading }]}>{t('tabFavorites')}</Text>
-            <Text style={[styles.subtext, { fontFamily: fonts.body }]}>Heart your favorite stores to see them here.</Text>
+            <Text style={[styles.subtext, { fontFamily: fonts.body }]}>{t('noFavorites')}</Text>
         </View>
     );
   }

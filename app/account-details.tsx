@@ -34,7 +34,7 @@ export default function AccountDetailsScreen() {
       router.back();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+      Alert.alert(t('error'), t('updateFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -81,7 +81,7 @@ export default function AccountDetailsScreen() {
                 <Ionicons name="person-outline" size={20} color={Colors.gray} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { fontFamily: fonts.body }]}
-                  placeholder="e.g. Sok Dara"
+                  placeholder={t('exampleName')}
                   value={name}
                   onChangeText={setName}
                   placeholderTextColor={Colors.gray + '80'}
@@ -95,7 +95,7 @@ export default function AccountDetailsScreen() {
                 <Ionicons name="gift-outline" size={20} color={Colors.gray} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { fontFamily: fonts.body }]}
-                  placeholder="Enter code"
+                  placeholder={t('enterCodePlaceholder')}
                   value={referralCode}
                   onChangeText={setReferralCode}
                   autoCapitalize="characters"

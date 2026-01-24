@@ -20,9 +20,10 @@ export default function PasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Check if user exists
-  const existingUser = useQuery(api.users.getUser, phone ? { phoneNumber: phone } : "skip");
-  const isNewUser = existingUser === null;
+  // Check if user exists by phone number
+  const accountExists = useQuery(api.auth.checkAccount, phone ? { phoneNumber: phone } : "skip");
+  const isQueryLoading = accountExists === undefined;
+  const isNewUser = accountExists === false;
 
   const handleContinue = async () => {
     if (password.length < 6) {
@@ -35,17 +36,27 @@ export default function PasswordScreen() {
 
     try {
       if (isNewUser) {
-        // For new users, we might still want to verify phone? 
-        // But the task is "phone + password". 
-        // We'll proceed to info screen after setting password.
-        await signUp(phone!, password, 'consumer');
+        // For new users, create account and proceed to info screen
+        await signUp(phone!, password);
         router.push({ pathname: '/auth/info', params: { phone } });
       } else {
         await signIn(phone!, password);
         router.replace('/');
       }
     } catch (e: any) {
-      setError(t('invalidCredentials'));
+      // If account already exists, automatically try to sign in instead
+      if (e?.message?.includes('already exists')) {
+        try {
+          await signIn(phone!, password);
+          router.replace('/');
+          return;
+        } catch (signInError: any) {
+          // Sign in also failed - show the sign in error (likely wrong password)
+          setError(signInError?.message || t('invalidCredentials'));
+        }
+      } else {
+        setError(e?.message || t('invalidCredentials'));
+      }
     } finally {
       setLoading(false);
     }
@@ -106,9 +117,9 @@ export default function PasswordScreen() {
                     <TouchableOpacity 
                         style={[styles.button, { opacity: password.length >= 6 ? 1 : 0.5 }]} 
                         onPress={handleContinue}
-                        disabled={password.length < 6 || loading || existingUser === undefined}
+                        disabled={password.length < 6 || loading || accountExists === undefined}
                     >
-                        {loading ? (
+                        {loading || isQueryLoading ? (
                           <ActivityIndicator color={Colors.white} />
                         ) : (
                           <>

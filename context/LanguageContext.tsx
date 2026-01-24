@@ -24,10 +24,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return dict[key] || translations['en'][key] || key;
   };
 
-          const fonts = {
-            heading: language === 'km' ? 'NotoSerifKhmer' : (language === 'zh' ? 'NotoSansSCBold' : 'RecoletaBold'),
-            body: language === 'km' ? 'NotoSansKhmer' : (language === 'zh' ? 'NotoSansSCRegular' : 'GoogleSans'),
-          };  return (
+  const fonts = {
+    heading: language === 'km' || language === 'zh' ? 'GoogleSansBold' : 'RecoletaBold',
+    body: 'GoogleSans',
+  };
+
+  return (
     <LanguageContext.Provider value={{ language, setLanguage, t, fonts }}>
       {children}
     </LanguageContext.Provider>

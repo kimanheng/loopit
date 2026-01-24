@@ -71,7 +71,7 @@ export const get = query({
 });
 
 export const getMyStore = query({
-  args: { ownerId: v.string() },
+  args: { ownerId: v.id("accounts") },
   handler: async (ctx, args) => {
     const store = await ctx.db
       .query("stores")
@@ -100,7 +100,7 @@ export const getMyStore = query({
 
 export const createStore = mutation({
   args: {
-    ownerId: v.string(),
+    ownerId: v.id("accounts"),
     name: v.string(),
     category: v.string(),
     latitude: v.number(),
@@ -111,6 +111,7 @@ export const createStore = mutation({
     logoStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
+    const now = Date.now();
     const storeId = await ctx.db.insert("stores", {
       ownerId: args.ownerId,
       name: args.name,
@@ -126,7 +127,9 @@ export const createStore = mutation({
       price: 0,
       originalPrice: 0,
       itemsLeft: 0, 
-      isActive: false, 
+      isActive: false,
+      createdAt: now,
+      updatedAt: now,
     });
     return storeId;
   },

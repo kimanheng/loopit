@@ -58,7 +58,7 @@ export default function OrderSuccessScreen() {
             </Text>
             
             <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
-            You&apos;ve secured a Surprise Bag from <Text style={styles.storeName}>{store?.name || 'the store'}</Text>.
+            {t('securedBag')} <Text style={styles.storeName}>{store?.name || t('storeNotFound')}</Text>.
             </Text>
 
             <View style={styles.codeContainer}>
@@ -68,7 +68,7 @@ export default function OrderSuccessScreen() {
 
             <View style={styles.card}>
                 <Text style={[styles.cardTitle, { fontFamily: fonts.body }]}>{t('collect')}</Text>
-                <Text style={[styles.cardTime, { fontFamily: fonts.heading }]}>{store?.pickupTime || 'Check store details'}</Text>
+                <Text style={[styles.cardTime, { fontFamily: fonts.heading }]}>{store?.pickupTime || t('checkStoreDetails')}</Text>
                 
                 <View style={styles.divider} />
                 
@@ -104,7 +104,7 @@ export default function OrderSuccessScreen() {
                 {store?.plusCode && (
                     <View style={styles.locationDetailRow}>
                         <Ionicons name="map-outline" size={16} color={Colors.gray} />
-                        <Text style={[styles.plusCode, { fontFamily: fonts.body }]}>Plus Code: {store.plusCode}</Text>
+                        <Text style={[styles.plusCode, { fontFamily: fonts.body }]}>{t('plusCodeLabel')}: {store.plusCode}</Text>
                     </View>
                 )}
 

@@ -6,7 +6,6 @@ import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
 import { useOrders } from '../../context/OrdersContext';
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -16,17 +15,11 @@ export default function ReserveScreen() {
     const router = useRouter();
     const { t, fonts } = useLanguage();
     const { addOrder } = useOrders();
-    const { user } = useAuth();
     
     const store = useQuery(api.stores.get, { id: id as any });
 
     const [quantity, setQuantity] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    if (user?.userType === 'business') {
-        router.back();
-        return null;
-    }
 
     if (store === undefined) {
         return (

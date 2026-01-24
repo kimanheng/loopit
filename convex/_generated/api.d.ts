@@ -8,9 +8,14 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
 import type * as favorites from "../favorites.js";
 import type * as files from "../files.js";
+import type * as gdpr from "../gdpr.js";
+import type * as lib_password from "../lib/password.js";
+import type * as merchants from "../merchants.js";
 import type * as orders from "../orders.js";
+import type * as roles from "../roles.js";
 import type * as stores from "../stores.js";
 import type * as users from "../users.js";
 
@@ -21,9 +26,14 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
   favorites: typeof favorites;
   files: typeof files;
+  gdpr: typeof gdpr;
+  "lib/password": typeof lib_password;
+  merchants: typeof merchants;
   orders: typeof orders;
+  roles: typeof roles;
   stores: typeof stores;
   users: typeof users;
 }>;

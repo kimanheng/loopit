@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors } from '../constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLanguage } from '../context/LanguageContext';
 
 const CATEGORIES = [
   { id: '1', name: 'Meals', icon: 'restaurant-outline', key: 'catMeals' },
-  { id: '2', name: 'Baked Goods', icon: 'nutrition-outline', key: 'catBakedGoods' },
+  { id: '2', name: 'Baked Goods', icon: 'food-croissant', key: 'catBakedGoods', iconSet: 'material' as const },
   { id: '3', name: 'Groceries', icon: 'cart-outline', key: 'catGroceries' },
   { id: '5', name: 'Vegan', icon: 'leaf-outline', key: 'catVegan' },
 ];
@@ -45,12 +45,21 @@ export default function CategoryFilter({ selectedCategory, onSelectCategory }: C
               style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
               onPress={() => onSelectCategory(isSelected ? null : cat.name)}
             >
-               <Ionicons 
-                name={cat.icon as any} 
-                size={16} 
-                color={isSelected ? Colors.white : Colors.deepGreen} 
-                style={{ marginRight: 6 }} 
-              />
+               {'iconSet' in cat && cat.iconSet === 'material' ? (
+                <MaterialCommunityIcons 
+                  name={cat.icon as any} 
+                  size={16} 
+                  color={isSelected ? Colors.white : Colors.deepGreen} 
+                  style={{ marginRight: 6 }} 
+                />
+              ) : (
+                <Ionicons 
+                  name={cat.icon as any} 
+                  size={16} 
+                  color={isSelected ? Colors.white : Colors.deepGreen} 
+                  style={{ marginRight: 6 }} 
+                />
+              )}
               <Text style={[
                   styles.categoryText, 
                   { fontFamily: fonts.body },

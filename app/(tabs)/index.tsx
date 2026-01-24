@@ -166,7 +166,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <SectionHeader 
-            title={selectedCategory ? `${selectedCategory} near you` : t('recommended')} 
+            title={selectedCategory ? `${t(`cat${selectedCategory.replace(/\s+/g, '')}` as any)} ${t('nearYou')}` : t('recommended')} 
             onPress={() => navigateToSection("Recommended", "recommended")} 
         />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>

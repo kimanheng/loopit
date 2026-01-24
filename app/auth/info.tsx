@@ -40,7 +40,7 @@ export default function InfoScreen() {
                         {t('completeProfile')}
                     </Text>
                     <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
-                        Just a few more details to get you started on your food saving journey.
+                        {t('profileSubtitle')}
                     </Text>
                 </View>
 
@@ -51,7 +51,7 @@ export default function InfoScreen() {
                             <Ionicons name="person-outline" size={20} color={Colors.gray} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { fontFamily: fonts.body }]}
-                                placeholder="e.g. Sok Dara"
+                                placeholder={t('exampleName')}
                                 value={name}
                                 onChangeText={setName}
                                 placeholderTextColor={Colors.gray + '80'}
@@ -65,7 +65,7 @@ export default function InfoScreen() {
                             <Ionicons name="gift-outline" size={20} color={Colors.gray} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { fontFamily: fonts.body }]}
-                                placeholder="Enter code"
+                                placeholder={t('enterCodePlaceholder')}
                                 value={referralCode}
                                 onChangeText={setReferralCode}
                                 autoCapitalize="characters"
@@ -86,7 +86,7 @@ export default function InfoScreen() {
                     </TouchableOpacity>
                     
                     <Text style={[styles.termsText, { fontFamily: fonts.body }]}>
-                        By continuing, you agree to our Terms of Service and Privacy Policy.
+                        {t('termsAgree')}
                     </Text>
                 </View>
             </View>

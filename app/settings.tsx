@@ -24,12 +24,12 @@ interface SettingsItem {
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t, fonts } = useLanguage();
-  const { signOut, user, switchUserType } = useAuth();
+  const { signOut } = useAuth();
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
-  const SECTIONS: { title: string; items: SettingsItem[] }[] = [
+  const SECTIONS: { titleKey: string; items: SettingsItem[] }[] = [
     {
-      title: 'SETTINGS',
+      titleKey: 'sectionSettings',
       items: [
         { id: 'account', labelKey: 'accountDetails', icon: 'person-outline' },
         { id: 'payment', labelKey: 'paymentCards', icon: 'card-outline' },
@@ -38,27 +38,22 @@ export default function SettingsScreen() {
       ]
     },
     {
-      title: 'COMMUNITY',
+      titleKey: 'sectionCommunity',
       items: [
         { id: 'invite', labelKey: 'inviteFriends', icon: 'people-outline' },
         { id: 'recommend', labelKey: 'recommendStore', icon: 'star-outline' },
       ]
     },
     {
-      title: 'SUPPORT',
+      titleKey: 'sectionSupport',
       items: [
         { id: 'help', labelKey: 'helpOrder', icon: 'briefcase-outline' },
         { id: 'how', labelKey: 'howItWorks', icon: 'help-circle-outline' },
-        // Conditional Business Item
-        ...(user && user.hasBusinessAccount 
-            ? [{ id: 'switchType', labelKey: user.userType === 'consumer' ? 'switchToBusiness' : 'switchToConsumer', icon: 'swap-horizontal-outline' }]
-            : (user ? [{ id: 'business', labelKey: 'signUpFoodBusiness', icon: 'storefront-outline' }] : [])
-        ),
         { id: 'careers', labelKey: 'careers', icon: 'business-outline' },
       ]
     },
     {
-      title: 'OTHER',
+      titleKey: 'sectionOther',
       items: [
         { id: 'hidden', labelKey: 'hiddenStores', icon: 'eye-off-outline' },
         { id: 'logout', labelKey: 'logOut', icon: 'log-out-outline', color: Colors.red },
@@ -71,12 +66,8 @@ export default function SettingsScreen() {
       signOut();
     } else if (item.id === 'account') {
       router.push('/account-details');
-    } else if (item.id === 'business') {
-      router.push('/auth/business-register');
     } else if (item.id === 'how') {
       router.push('/how-it-works');
-    } else if (item.id === 'switchType') {
-      switchUserType();
     } else if (item.isLanguage) {
       setShowLanguageOptions(!showLanguageOptions);
     }
@@ -103,8 +94,8 @@ export default function SettingsScreen() {
       
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {SECTIONS.map((section, secIndex) => (
-          <View key={section.title} style={styles.sectionContainer}>
-            <Text style={[styles.sectionHeader, { fontFamily: fonts.body }]}>{section.title}</Text>
+          <View key={section.titleKey} style={styles.sectionContainer}>
+            <Text style={[styles.sectionHeader, { fontFamily: fonts.body }]}>{t(section.titleKey as any)}</Text>
             {section.items.map((item, index) => (
               <View key={item.id}>
                 <TouchableOpacity 

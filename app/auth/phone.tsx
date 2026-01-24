@@ -37,7 +37,7 @@ export default function PhoneScreen() {
                         {t('enterPhone')}
                     </Text>
                     <Text style={[styles.subtitle, { fontFamily: fonts.body }]}>
-                        We&apos;ll send you a verification code to confirm your number.
+                        {t('sendCodeDesc')}
                     </Text>
                 </View>
 

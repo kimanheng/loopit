@@ -4,7 +4,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { Colors } from '../constants/Colors';
 
 export default function Index() {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   
   if (isLoading) {
     return (
@@ -15,9 +15,6 @@ export default function Index() {
   }
 
   if (isAuthenticated) {
-    if (user?.userType === 'business') {
-        return <Redirect href="/business-profile" />;
-    }
     return <Redirect href="/(tabs)" />;
   } else {
     return <Redirect href="/auth/landing" />;
