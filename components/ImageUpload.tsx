@@ -13,7 +13,7 @@ interface ImageUploadProps {
   shape?: 'rectangle' | 'circle';
 }
 
-export default function ImageUpload({ label, initialImage, onImageSelected, aspect = [4, 3], shape = 'rectangle' }: ImageUploadProps) {
+export default function ImageUpload({ label, initialImage, onImageSelected, aspect = [21, 9], shape = 'rectangle' }: ImageUploadProps) {
   const [preview, setPreview] = useState(initialImage);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function ImageUpload({ label, initialImage, onImageSelected, aspe
       <TouchableOpacity 
         style={[
             styles.uploadArea, 
-            shape === 'circle' && styles.uploadAreaCircle
+            shape === 'circle' ? styles.uploadAreaCircle : styles.uploadAreaRectangle
         ]} 
         onPress={pickImage} 
       >
@@ -83,11 +83,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.lightGray,
     borderStyle: 'dashed',
     borderRadius: 8,
-    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     backgroundColor: '#f9f9f9',
+  },
+  uploadAreaRectangle: {
+    width: '100%',
+    aspectRatio: 21 / 9,
   },
   uploadAreaCircle: {
       width: 120,

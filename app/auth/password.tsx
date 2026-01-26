@@ -16,6 +16,7 @@ export default function PasswordScreen() {
   const { signIn, signUp } = useAuth();
   
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,11 @@ export default function PasswordScreen() {
   const handleContinue = async () => {
     if (password.length < 6) {
       setError(t('passwordTooShort'));
+      return;
+    }
+
+    if (isNewUser && password !== confirmPassword) {
+      setError(t('passwordsDoNotMatch'));
       return;
     }
 
@@ -109,8 +115,28 @@ export default function PasswordScreen() {
                                 />
                             </TouchableOpacity>
                         </View>
-                        {error ? <Text style={[styles.errorText, { fontFamily: fonts.body }]}>{error}</Text> : null}
                     </View>
+
+                    {isNewUser && (
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.label, { fontFamily: fonts.body }]}>{t('confirmPassword')}</Text>
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    style={[styles.input, { fontFamily: fonts.body }]}
+                                    placeholder="******"
+                                    secureTextEntry={!showPassword}
+                                    value={confirmPassword}
+                                    onChangeText={(text) => {
+                                        setConfirmPassword(text);
+                                        setError('');
+                                    }}
+                                    placeholderTextColor={Colors.gray + '80'}
+                                />
+                            </View>
+                        </View>
+                    )}
+
+                    {error ? <Text style={[styles.errorText, { fontFamily: fonts.body }]}>{error}</Text> : null}
                 </View>
 
                 <View style={styles.footer}>
